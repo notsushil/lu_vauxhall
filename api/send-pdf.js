@@ -17,13 +17,26 @@ module.exports = async (req, res) => {
 
   // Ensure we have the API key configured before proceeding.
   if (!process.env.RESEND_API_KEY) {
-    return res.status(500).json({ ok: false, error: "Missing RESEND_API_KEY" });
+    console.error("Missing RESEND_API_KEY environment variable");
+    return res.status(500).json({ 
+      ok: false, 
+      error: "Missing RESEND_API_KEY environment variable. Please set it in your environment or .env file." 
+    });
   }
 
   try {
     // Extract the data sent from our frontend form.
     // We use 'req.body' to get the JSON payload.
     const { pdfBase64, filename = "report.pdf", to, subject = "LevelUP Report", html } = req.body || {};
+
+    console.log("Received request:", { 
+      hasPdfBase64: !!pdfBase64, 
+      filename, 
+      to, 
+      subject,
+      hasHtml: !!html,
+      pdfSize: pdfBase64 ? pdfBase64.length : 0
+    });
 
     // Validate that the most important piece of data, the PDF content, exists.
     if (!pdfBase64) {
@@ -34,8 +47,13 @@ module.exports = async (req, res) => {
     // to a default recipient from our environment variables.
     const recipient = to || process.env.REPORT_TO;
     if (!recipient) {
-      return res.status(400).json({ ok: false, error: "Missing recipient email address" });
+      return res.status(400).json({ 
+        ok: false, 
+        error: "Missing recipient email address. Please provide 'to' in request body or set REPORT_TO environment variable." 
+      });
     }
+
+    console.log("Sending email to:", recipient);
     
     // Prevent excessively large files from being processed (e.g., >10MB).
     // Email providers often reject very large attachments.
@@ -64,7 +82,11 @@ module.exports = async (req, res) => {
     // Handle potential errors from the Resend API call.
     if (error) {
       console.error("Resend API Error:", error);
-      return res.status(500).json({ ok: false, error: error.message || "Failed to send email" });
+      return res.status(500).json({ 
+        ok: false, 
+        error: error.message || "Failed to send email",
+        details: error // Include full error details for debugging
+      });
     }
 
     // If successful, send a confirmation response back to the frontend.

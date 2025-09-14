@@ -400,6 +400,7 @@ export default function App() {
         body: JSON.stringify({
           pdfBase64: base64Content,
           filename: file.name,
+          to: "dhakalsushil02@gmail.com", // Your actual email
           subject: `LevelUP Shift Report - ${sydDate}`,
           html: htmlContent
         }),
@@ -410,6 +411,7 @@ export default function App() {
       if (response.ok) {
         alert(`✅ Report sent successfully to ${result.to}!`);
       } else {
+        console.error("API Error:", result);
         throw new Error(result.error || "Failed to send report");
       }
 
