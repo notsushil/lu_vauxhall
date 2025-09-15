@@ -400,7 +400,7 @@ export default function App() {
         body: JSON.stringify({
           pdfBase64: base64Content,
           filename: file.name,
-          to: "dhakalsushil02@gmail.com", // Your actual email
+          to: "levelupplegion@gmail.com", // Your verified Resend email
           subject: `LevelUP Shift Report - ${sydDate}`,
           html: htmlContent
         }),

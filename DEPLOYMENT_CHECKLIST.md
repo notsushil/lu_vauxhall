@@ -4,7 +4,7 @@
 - [ ] Environment variables set in Vercel dashboard:
   - [ ] RESEND_API_KEY (your actual Resend API key)
   - [ ] MAIL_FROM (LevelUp Reports <onboarding@resend.dev>)
-  - [ ] REPORT_TO (dhakalsushil02@gmail.com)
+  - [ ] REPORT_TO (levelupplegion@gmail.com)
 - [ ] Code changes committed and pushed to GitHub
 - [ ] Email address updated in both test file and main app
 
@@ -13,7 +13,7 @@
 - [ ] No build errors in Vercel logs
 - [ ] App loads correctly in browser
 - [ ] Form submission works without errors
-- [ ] Email received at dhakalsushil02@gmail.com
+- [ ] Email received at levelupplegion@gmail.com
 - [ ] Check spam folder if email not in inbox
 
 ## 🔧 Troubleshooting
