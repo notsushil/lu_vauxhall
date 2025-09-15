@@ -4,7 +4,7 @@
 - [ ] Environment variables set in Vercel dashboard:
   - [ ] RESEND_API_KEY (your actual Resend API key)
   - [ ] MAIL_FROM (LevelUp Reports <onboarding@resend.dev>)
-  - [ ] REPORT_TO (levelupplegion@gmail.com)
+  - [ ] REPORT_TO (dhakalsushil02@gmail.com)
 - [ ] Code changes committed and pushed to GitHub
 - [ ] Email address updated in both test file and main app
 
@@ -13,13 +13,13 @@
 - [ ] No build errors in Vercel logs
 - [ ] App loads correctly in browser
 - [ ] Form submission works without errors
-- [ ] Email received at levelupplegion@gmail.com
+- [ ] Email received at dhakalsushil02@gmail.com
 - [ ] Check spam folder if email not in inbox
 
 ## 🔧 Troubleshooting
 If email sending still fails:
 1. Check browser console for specific error messages
-2. Verify environment variables are set correctly in Vercel
+2. Verify environment variables are set correctly in Vercelre_6ZSdrDUD_NQ6Htzhk8mWdwyBtBnzGEef3
 3. Check Resend dashboard for API key status
 4. Ensure Resend account is verified
 5. Try the test script locally first

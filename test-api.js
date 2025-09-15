@@ -17,7 +17,7 @@ async function testEmailAPI() {
       body: JSON.stringify({
         pdfBase64: base64Content,
         filename: 'test-report.txt',
-        to: 'levelupplegion@gmail.com', // Replace with your verified Resend email
+        to: 'dhakalsushil02@gmail.com', // Replace with your verified Resend email
         subject: 'Test LevelUP Report',
         html: '<h1>Test Report</h1><p>This is a test email.</p>'
       }),
