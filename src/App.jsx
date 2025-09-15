@@ -47,11 +47,10 @@ const Theme = () => (
       --input:#ffffff22;
       --chip:#ffffff2e;
     }
-    *{box-sizing:border-box}
-    html, body, #root { height: 100%; }
+    
+    /* Global layout and typography */
     body {
-      margin: 0; color: var(--text-on);
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      color: var(--text-on);
       display:flex; justify-content:center; align-items:flex-start; min-height:100vh; background:none;
     }
     body::before{
