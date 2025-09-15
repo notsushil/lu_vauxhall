@@ -27,20 +27,17 @@ module.exports = async (req, res) => {
   try {
     // Extract the data sent from our frontend form.
     // We use 'req.body' to get the JSON payload.
-    const { pdfBase64, filename = "report.pdf", to, subject = "LevelUP Report", html } = req.body || {};
+    const { to, subject = "LevelUP Report", html } = req.body || {};
 
     console.log("Received request:", { 
-      hasPdfBase64: !!pdfBase64, 
-      filename, 
       to, 
       subject,
-      hasHtml: !!html,
-      pdfSize: pdfBase64 ? pdfBase64.length : 0
+      hasHtml: !!html
     });
 
-    // Validate that the most important piece of data, the PDF content, exists.
-    if (!pdfBase64) {
-      return res.status(400).json({ ok: false, error: "Missing pdfBase64 content" });
+    // Validate that we have HTML content to send.
+    if (!html) {
+      return res.status(400).json({ ok: false, error: "Missing HTML content" });
     }
 
     // Determine the recipient. Use the 'to' from the request, or fall back
@@ -54,29 +51,13 @@ module.exports = async (req, res) => {
     }
 
     console.log("Sending email to:", recipient);
-    
-    // Prevent excessively large files from being processed (e.g., >10MB).
-    // Email providers often reject very large attachments.
-    const approxBytes = Math.ceil((pdfBase64.length * 3) / 4);
-    if (approxBytes > 10 * 1024 * 1024) { // 10 MB
-        return res.status(413).json({ ok: false, error: "Attachment too large (>10MB)" });
-    }
-
-    // Convert the Base64 string back into a binary buffer, which is what Resend needs.
-    const attachmentBuffer = Buffer.from(pdfBase64, "base64");
 
     // This is the core call to the Resend API.
     const { data, error } = await resend.emails.send({
       from: process.env.MAIL_FROM || "LevelUp Reports <onboarding@resend.dev>", // Friendly default while no custom domain
       to: recipient,
       subject: subject,
-      html: html || "<p>Please find your report attached.</p>",
-      attachments: [
-        {
-          filename: filename,
-          content: attachmentBuffer,
-        },
-      ],
+      html: html,
     });
 
     // Handle potential errors from the Resend API call.

@@ -1,12 +1,52 @@
-# React + Vite
+# LevelUP Report Generator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React application for generating and sending shift reports via email using Vercel serverless functions.
 
-Currently, two official plugins are available:
+## Development Setup
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Option 1: Vercel Dev (Recommended)
+This approach runs both the frontend and API routes locally using Vercel's development server:
 
-## Expanding the ESLint configuration
+```bash
+npm run dev:vercel
+# or
+vercel dev
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+This will start the development server at `http://localhost:3000` with full API support.
+
+### Option 2: Vite Dev with Proxy
+This approach uses Vite's dev server with a proxy to forward API calls:
+
+1. Start Vercel dev in one terminal (for API routes):
+```bash
+vercel dev --listen 3000
+```
+
+2. Start Vite dev in another terminal (for frontend):
+```bash
+npm run dev:vite
+```
+
+The Vite dev server will run at `http://localhost:5173` and proxy `/api/*` requests to `http://localhost:3000`.
+
+## Environment Variables
+
+Create a `.env.local` file with:
+```
+RESEND_API_KEY=your_resend_api_key
+MAIL_FROM=your_email@domain.com
+REPORT_TO=recipient@domain.com
+VITE_OWM_KEY=your_openweathermap_api_key
+```
+
+## API Routes
+
+- `POST /api/send-report` - Sends report via email using Resend
+
+## Tech Stack
+
+- React + Vite
+- Vercel Serverless Functions
+- Resend (email service)
+- OpenWeatherMap API

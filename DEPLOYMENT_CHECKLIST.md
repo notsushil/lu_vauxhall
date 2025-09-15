@@ -19,7 +19,7 @@
 ## 🔧 Troubleshooting
 If email sending still fails:
 1. Check browser console for specific error messages
-2. Verify environment variables are set correctly in Vercelre_6ZSdrDUD_NQ6Htzhk8mWdwyBtBnzGEef3
+2. Verify environment variables are set correctly in Vercel
 3. Check Resend dashboard for API key status
 4. Ensure Resend account is verified
 5. Try the test script locally first

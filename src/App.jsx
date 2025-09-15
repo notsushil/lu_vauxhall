@@ -361,7 +361,7 @@ export default function App() {
     alert("Local draft cleared.");
   }
 
-  // Enhanced submit function that generates PDF and sends via email
+  // Enhanced submit function that sends report via email
   async function submit(){
     try {
       // Generate report data
@@ -379,27 +379,13 @@ export default function App() {
       // Generate HTML content for the report
       const htmlContent = generateReportHTML(reportData);
       
-      // Create a text-based report as attachment
-      const reportText = generateReportText(reportData);
-      
-      // Create a blob and send as attachment
-      const blob = new Blob([reportText], { type: 'text/plain' });
-      const file = new File([blob], `LevelUP_Report_${new Date().toISOString().split('T')[0]}.txt`, {
-        type: 'text/plain'
-      });
-
-      // Convert to base64 for email sending
-      const base64Content = await fileToBase64(file);
-      
       // Send via your existing API
-      const response = await fetch("/api/send-pdf", {
+      const response = await fetch("/api/send-report", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          pdfBase64: base64Content,
-          filename: file.name,
           to: "dhakalsushil02@gmail.com", // Your verified Resend email
           subject: `LevelUP Shift Report - ${sydDate}`,
           html: htmlContent
@@ -421,18 +407,6 @@ export default function App() {
     }
   }
 
-  // Helper function to convert file to base64
-  async function fileToBase64(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        const base64String = reader.result.split(',')[1];
-        resolve(base64String);
-      };
-      reader.onerror = error => reject(error);
-    });
-  }
 
   // Generate HTML content for the report
   function generateReportHTML(data) {
