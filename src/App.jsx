@@ -1,39 +1,28 @@
 // src/App.jsx
 import React, { useMemo, useState, useEffect } from "react";
 
-/** ========= Config ========= */
-const HOURS = [
-  "10am","11am","12pm","1pm","2pm","3pm","4pm","5pm","6pm","7pm","8pm","9pm",
-  "10pm","11pm","12am","1am","2am","3am","4am","5am","6am"
-];
+// Import utilities
+import { toMoney, parseMoney, numFmt, slug } from "./lib/format.js";
+import { HOURS, emptyRow } from "./lib/time.js";
+import { 
+  loadReportData, 
+  loadJackpotTemplate, 
+  loadEthnicityTemplate,
+  saveReportData,
+  saveJackpotTemplate,
+  saveEthnicityTemplate,
+  clearReportData,
+  getDefaultRoster,
+  getDefaultLogs
+} from "./lib/storage.js";
+import { DEFAULT_JACKPOT_TEMPLATE, DEFAULT_ETHNICITY_TEMPLATE } from "./lib/constants.js";
 
-const LSK_REPORT   = "levelup_report_draft";
-const LSK_JACKPOTS = "levelup_jackpot_template_v1";
-const LSK_ETH      = "levelup_ethnicity_template_v1";
-
-function slug(s){
-  return String(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-}
-
-const DEFAULT_JACKPOT_TEMPLATE = [
-  { id: slug("Dragon Link $15k"),        name: "Dragon Link $15k" },
-  { id: slug("Dollar Storm $50k"),       name: "Dollar Storm $50k" },
-  { id: slug("Dragon Link $20k"),        name: "Dragon Link $20k" },
-  { id: slug("Bull Rush $20k"),          name: "Bull Rush $20k" },
-  { id: slug("Dragon Link $90k"),        name: "Dragon Link $90k" },
-  { id: slug("Shenlong Unleashed $50k"), name: "Shenlong Unleashed $50k" },
-];
-
-const DEFAULT_ETHNICITY_TEMPLATE = [
-  { key: "Middle Eastern" },
-  { key: "East Asian" },
-  { key: "South Asian" },
-  { key: "European" },
-  { key: "Maori/Pacific" },
-  { key: "African" },
-  { key: "Latin American" },
-  { key: "Other" },
-];
+// Import components
+import { RosterSection } from "./components/RosterCard.jsx";
+import { LogSection } from "./components/LogSection.jsx";
+import { JackpotsSection } from "./components/Jackpots.jsx";
+import { EthnicityEditor } from "./components/EthnicityEditor.jsx";
+import { VipDrawer } from "./components/VipDrawer.jsx";
 
 /** ========= Styles ========= */
 const Theme = () => (
@@ -129,30 +118,7 @@ const Theme = () => (
   `}</style>
 );
 
-/** ========= Helpers ========= */
-const moneyFmt = new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 });
-const numFmt   = new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 });
-const toMoney  = (n) => Number.isFinite(n) ? `$${moneyFmt.format(n)}` : "";
-const parseMoney = (v) => Number(String(v ?? "").replace(/[^0-9.\-]/g, "")) || 0;
-
-const emptyRow = (hour) => ({ hour, turnover: "", egm: "", vip: {} });
-
-function buildTimeOptions() {
-  const opts = [];
-  let h = 9, m = 0;
-  for (let i = 0; i <= 21 * 2; i++) {
-    const hh = ((h + 11) % 12) + 1;
-    const ampm = h >= 12 ? "pm" : "am";
-    const mm = m.toString().padStart(2, "0");
-    opts.push(`${hh}:${mm} ${ampm}`);
-    m += 30; if (m === 60) { m = 0; h = (h + 1) % 24; }
-  }
-  return opts;
-}
-const TIME_OPTIONS = buildTimeOptions();
-function autosize(el){ if(!el) return; el.style.height="auto"; el.style.height=el.scrollHeight+"px"; }
-
-/** ========= Main ========= */
+/** ========= Main Component ========= */
 export default function App() {
   /** Date (no time) & Weather */
   const [sydDate, setSydDate] = useState("");
@@ -180,58 +146,125 @@ export default function App() {
       .catch(()=>{});
   }, []);
 
-  /** Load Drafts */
-  const [rows, setRows] = useState(() => {
-    const saved = localStorage.getItem(LSK_REPORT);
-    if (saved) {
-      try {
-        const p = JSON.parse(saved);
-        if (Array.isArray(p)) return p;
-        if (p && p.rows) return p.rows;
-      } catch {}
-    }
-    return HOURS.map(emptyRow);
-  });
+  /** Load Data from Storage */
+  const defaultRows = HOURS.map(emptyRow);
+  const { rows, roster, logs, jackpots } = loadReportData(defaultRows);
+  const [reportRows, setReportRows] = useState(rows);
+  const [reportRoster, setReportRoster] = useState(roster);
+  const [reportLogs, setReportLogs] = useState(logs);
+  const [reportJackpots, setReportJackpots] = useState(jackpots);
 
-  const defaultRoster = {
-    managers: { open:{names:""}, mid:{names:""}, close:{names:""} },
-    staffs:   { open:{names:""}, mid:{names:""}, close:{names:""} },
-    security: { shift:"", names:"" },
-  };
-  const [roster, setRoster] = useState(() => {
-    const saved = localStorage.getItem(LSK_REPORT);
-    if (saved) {
-      try {
-        const p = JSON.parse(saved);
-        if (Array.isArray(p)) return defaultRoster;
-        const r = p.roster ?? defaultRoster;
-        return { ...defaultRoster, ...r };
-      } catch {}
-    }
-    return defaultRoster;
-  });
+  /** Templates */
+  const [ethnicityTemplate, setEthnicityTemplate] = useState(() => 
+    loadEthnicityTemplate(DEFAULT_ETHNICITY_TEMPLATE)
+  );
+  const [jackpotTemplate, setJackpotTemplate] = useState(() => 
+    loadJackpotTemplate(DEFAULT_JACKPOT_TEMPLATE)
+  );
 
-  const defaultLogs = { gaming: [], bar: [], incidents: [] };
-  const [logs, setLogs] = useState(() => {
-    const saved = localStorage.getItem(LSK_REPORT);
-    if (saved) { try {
-      const p = JSON.parse(saved);
-      if (Array.isArray(p)) return defaultLogs;
-      return p.logs ?? defaultLogs;
-    } catch {} }
-    return defaultLogs;
-  });
-
-  /** Editable Ethnicity Template */
-  const [ethnicityTemplate, setEthnicityTemplate] = useState(() => {
-    const saved = localStorage.getItem(LSK_ETH);
-    if (saved) { try { return JSON.parse(saved); } catch {} }
-    return DEFAULT_ETHNICITY_TEMPLATE;
-  });
+  /** Template Editing States */
   const [editingEth, setEditingEth] = useState(false);
   const [ethDraft, setEthDraft] = useState(() => ethnicityTemplate.map(e => ({...e})));
-  useEffect(() => { setEthDraft(ethnicityTemplate.map(e => ({...e}))); }, [editingEth]);
+  const [editingNames, setEditingNames] = useState(false);
+  const [namesDraft, setNamesDraft] = useState(() => jackpotTemplate.map(j => ({...j})));
 
+  useEffect(() => { setEthDraft(ethnicityTemplate.map(e => ({...e}))); }, [editingEth]);
+  useEffect(() => { setNamesDraft(jackpotTemplate.map(j => ({...j}))); }, [editingNames]);
+
+  /** VIP Editing State */
+  const [editing, setEditing] = useState(null);
+  const [editEthnicity, setEditEthnicity] = useState(ethnicityTemplate[0]?.key || "");
+  const [editCount, setEditCount] = useState("");
+  
+  useEffect(() => {
+    setEditEthnicity(prev => ethnicityTemplate.find(e=>e.key===prev)?.key ?? (ethnicityTemplate[0]?.key || ""));
+  }, [ethnicityTemplate]);
+
+  /** Aggregates */
+  const totals = useMemo(() => {
+    const all = Object.fromEntries(ethnicityTemplate.map(e => [e.key, 0]));
+    let egmSum = 0;
+    reportRows.forEach(r => {
+      egmSum += parseMoney(r.egm);
+      for (const [k, v] of Object.entries(r.vip || {})) all[k] = (all[k]||0) + (Number(v)||0);
+    });
+    return { all, egmSum };
+  }, [reportRows, ethnicityTemplate]);
+
+  const increments = useMemo(() => {
+    const inc = [];
+    for (let i=0; i<reportRows.length; i++){
+      const cur = parseMoney(reportRows[i].turnover);
+      const prev = i===0 ? 0 : parseMoney(reportRows[i-1].turnover);
+      const val = i===0 ? cur : (cur - prev);
+      inc.push(val > 0 ? val : 0);
+    }
+    return inc;
+  }, [reportRows]);
+
+  /** Actions */
+  function updateCell(i, key, value){
+    setReportRows(prev => { const next=[...prev]; next[i] = { ...next[i], [key]: value }; return next; });
+  }
+  
+  function formatTurnoverOnBlur(i){
+    setReportRows(prev => { const next=[...prev]; const n=parseMoney(next[i].turnover); next[i].turnover = n ? toMoney(n) : ""; return next; });
+  }
+
+  function openEdit(i){ setEditing(i); setEditEthnicity(ethnicityTemplate[0]?.key || ""); setEditCount(""); }
+  
+  function addVip(){
+    if (editing==null) return;
+    const c = Number(editCount); if (!c) return;
+    setReportRows(prev=>{
+      const next=[...prev]; const r={...next[editing]}; const vip={...(r.vip||{})};
+      vip[editEthnicity] = (Number(vip[editEthnicity])||0) + c;
+      r.vip = vip; next[editing]=r; return next;
+    });
+    setEditCount("");
+  }
+  
+  function removeVip(eth){
+    if (editing==null) return;
+    setReportRows(prev=>{
+      const next=[...prev]; const r={...next[editing]}; const vip={...(r.vip||{})};
+      delete vip[eth]; r.vip=vip; next[editing]=r; return next;
+    });
+  }
+
+  function updateRoster(group, shift, value){
+    setReportRoster(prev => ({ ...prev, [group]: { ...prev[group], [shift]: { names:value } } }));
+  }
+  
+  function updateSecurity(field, value){
+    setReportRoster(prev => ({ ...prev, security: { ...prev.security, [field]: value } }));
+  }
+
+  function addLogRow(kind){ setReportLogs(prev => ({ ...prev, [kind]: [...prev[kind], { time:"", note:"" }] })); }
+  
+  function updateLog(kind, index, field, value){
+    setReportLogs(prev => {
+      const next = { ...prev };
+      next[kind] = next[kind].map((row,i)=> i===index ? { ...row, [field]: value } : row);
+      return next;
+    });
+  }
+  
+  function removeLog(kind, index){
+    setReportLogs(prev => {
+      const next = { ...prev };
+      next[kind] = next[kind].filter((_,i)=>i!==index);
+      return next;
+    });
+  }
+
+  function updateJackpotAmount(id, value){ setReportJackpots(prev=>({ ...prev, [id]: value })); }
+  
+  function formatJackpotOnBlur(id){
+    setReportJackpots(prev => { const raw=parseMoney(prev[id]); return { ...prev, [id]: raw ? toMoney(raw) : "" }; });
+  }
+
+  /** Template Management */
   function startEditEth(){ setEditingEth(true); }
   function cancelEditEth(){ setEditingEth(false); }
   function changeEthName(idx, value){
@@ -242,150 +275,60 @@ export default function App() {
   function saveEth(){
     const clean = ethDraft.map(e=>({ key: String(e.key||"").trim() })).filter(e=>e.key);
     setEthnicityTemplate(clean);
-    localStorage.setItem(LSK_ETH, JSON.stringify(clean));
-    // keep drawer value valid
+    saveEthnicityTemplate(clean);
     setEditEthnicity(prev => clean.find(e=>e.key===prev)?.key ?? (clean[0]?.key || ""));
     setEditingEth(false);
   }
 
-  /** Jackpots (editable names + amounts) */
-  const [jackpotTemplate, setJackpotTemplate] = useState(() => {
-    const saved = localStorage.getItem(LSK_JACKPOTS);
-    if (saved) { try { return JSON.parse(saved); } catch {} }
-    return DEFAULT_JACKPOT_TEMPLATE;
-  });
-  const [jackpots, setJackpots] = useState(() => {
-    const saved = localStorage.getItem(LSK_REPORT);
-    if (saved) { try {
-      const p = JSON.parse(saved);
-      if (Array.isArray(p)) return {};
-      return p.jackpots ?? {};
-    } catch {} }
-    return {};
-  });
-  const [editingNames, setEditingNames] = useState(false);
-  const [namesDraft, setNamesDraft] = useState(() => jackpotTemplate.map(j => ({...j})));
-  useEffect(() => { setNamesDraft(jackpotTemplate.map(j => ({...j}))); }, [editingNames]);
-
-  /** Aggregates */
-  const totals = useMemo(() => {
-    const all = Object.fromEntries(ethnicityTemplate.map(e => [e.key, 0]));
-    let egmSum = 0;
-    rows.forEach(r => {
-      egmSum += parseMoney(r.egm);
-      for (const [k, v] of Object.entries(r.vip || {})) all[k] = (all[k]||0) + (Number(v)||0);
-    });
-    return { all, egmSum };
-  }, [rows, ethnicityTemplate]);
-
-  const increments = useMemo(() => {
-    const inc = [];
-    for (let i=0; i<rows.length; i++){
-      const cur = parseMoney(rows[i].turnover);
-      const prev = i===0 ? 0 : parseMoney(rows[i-1].turnover);
-      const val = i===0 ? cur : (cur - prev);
-      inc.push(val > 0 ? val : 0);
-    }
-    return inc;
-  }, [rows]);
-
-  /** Actions */
-  function updateCell(i, key, value){
-    setRows(prev => { const next=[...prev]; next[i] = { ...next[i], [key]: value }; return next; });
-  }
-  function formatTurnoverOnBlur(i){
-    setRows(prev => { const next=[...prev]; const n=parseMoney(next[i].turnover); next[i].turnover = n ? toMoney(n) : ""; return next; });
-  }
-
-  const [editing, setEditing] = useState(null);
-  const [editEthnicity, setEditEthnicity] = useState(ethnicityTemplate[0]?.key || "");
-  const [editCount, setEditCount] = useState("");
-  useEffect(() => {
-    setEditEthnicity(prev => ethnicityTemplate.find(e=>e.key===prev)?.key ?? (ethnicityTemplate[0]?.key || ""));
-  }, [ethnicityTemplate]);
-
-  function openEdit(i){ setEditing(i); setEditEthnicity(ethnicityTemplate[0]?.key || ""); setEditCount(""); }
-  function addVip(){
-    if (editing==null) return;
-    const c = Number(editCount); if (!c) return;
-    setRows(prev=>{
-      const next=[...prev]; const r={...next[editing]}; const vip={...(r.vip||{})};
-      vip[editEthnicity] = (Number(vip[editEthnicity])||0) + c;
-      r.vip = vip; next[editing]=r; return next;
-    });
-    setEditCount("");
-  }
-  function removeVip(eth){
-    if (editing==null) return;
-    setRows(prev=>{
-      const next=[...prev]; const r={...next[editing]}; const vip={...(r.vip||{})};
-      delete vip[eth]; r.vip=vip; next[editing]=r; return next;
-    });
-  }
-
-  function updateRoster(group, shift, value){
-    setRoster(prev => ({ ...prev, [group]: { ...prev[group], [shift]: { names:value } } }));
-  }
-  function updateSecurity(field, value){
-    setRoster(prev => ({ ...prev, security: { ...prev.security, [field]: value } }));
-  }
-
-  function addLogRow(kind){ setLogs(prev => ({ ...prev, [kind]: [...prev[kind], { time:"", note:"" }] })); }
-  function updateLog(kind, index, field, value){
-    setLogs(prev => {
-      const next = { ...prev };
-      next[kind] = next[kind].map((row,i)=> i===index ? { ...row, [field]: value } : row);
+  function startEditNames(){ setEditingNames(true); }
+  function cancelEditNames(){ setEditingNames(false); }
+  function changeName(i, value){
+    setNamesDraft(prev => {
+      const next=[...prev];
+      next[i] = { ...next[i], name:value };
       return next;
     });
   }
-  function removeLog(kind, index){
-    setLogs(prev => {
-      const next = { ...prev };
-      next[kind] = next[kind].filter((_,i)=>i!==index);
-      return next;
-    });
-  }
-
-  function updateJackpotAmount(id, value){ setJackpots(prev=>({ ...prev, [id]: value })); }
-  function formatJackpotOnBlur(id){
-    setJackpots(prev => { const raw=parseMoney(prev[id]); return { ...prev, [id]: raw ? toMoney(raw) : "" }; });
+  function saveNames(){
+    const cleaned = namesDraft
+      .map(j => ({ id: slug(j.name || j.id), name: (j.name ?? "").trim() }))
+      .filter(j => j.name);
+    setJackpotTemplate(cleaned);
+    saveJackpotTemplate(cleaned);
+    setEditingNames(false);
   }
 
   function saveDraft(){
-    localStorage.setItem(LSK_REPORT, JSON.stringify({ rows, roster, logs, jackpots }));
+    saveReportData({ rows: reportRows, roster: reportRoster, logs: reportLogs, jackpots: reportJackpots });
     alert("Draft saved locally.");
   }
+  
   function clearDraft(){
-    localStorage.removeItem(LSK_REPORT);
+    clearReportData();
     alert("Local draft cleared.");
   }
 
   // Enhanced submit function that sends report via email
   async function submit(){
     try {
-      // Generate report data
       const reportData = {
         date: sydDate,
         weather: weather,
-        rows: rows,
-        roster: roster,
-        logs: logs,
-        jackpots: jackpots,
+        rows: reportRows,
+        roster: reportRoster,
+        logs: reportLogs,
+        jackpots: reportJackpots,
         totals: totals,
         submittedAt: new Date().toISOString()
       };
 
-      // Generate HTML content for the report
       const htmlContent = generateReportHTML(reportData);
       
-      // Send via your existing API
       const response = await fetch("/api/send-report", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          to: "dhakalsushil02@gmail.com", // Your verified Resend email
+          to: "dhakalsushil02@gmail.com",
           subject: `LevelUP Shift Report - ${sydDate}`,
           html: htmlContent
         }),
@@ -405,7 +348,6 @@ export default function App() {
       alert(`❌ Error: ${error.message}`);
     }
   }
-
 
   // Generate HTML content for the report
   function generateReportHTML(data) {
@@ -464,76 +406,6 @@ export default function App() {
     `;
   }
 
-  // Generate text content for the report
-  function generateReportText(data) {
-    let text = `LevelUP Shift Report\n`;
-    text += `Date: ${data.date}\n`;
-    if (data.weather) {
-      text += `Weather: ${data.weather.temp}°C - ${data.weather.desc}\n`;
-    }
-    text += `\n`;
-    
-    text += `ROSTER\n`;
-    text += `Managers - Open: ${data.roster.managers.open.names}\n`;
-    text += `Managers - Mid: ${data.roster.managers.mid.names}\n`;
-    text += `Managers - Close: ${data.roster.managers.close.names}\n`;
-    text += `Staff - Open: ${data.roster.staffs.open.names}\n`;
-    text += `Staff - Mid: ${data.roster.staffs.mid.names}\n`;
-    text += `Staff - Close: ${data.roster.staffs.close.names}\n`;
-    text += `Security: ${data.roster.security.shift} - ${data.roster.security.names}\n\n`;
-    
-    text += `HOURLY DATA\n`;
-    data.rows.forEach(row => {
-      text += `${row.hour}: Turnover ${row.turnover}, EGM ${row.egm}`;
-      if (row.vip && Object.keys(row.vip).length > 0) {
-        text += `, VIP: ${Object.entries(row.vip).map(([k,v]) => `${k}: ${v}`).join(', ')}`;
-      }
-      text += `\n`;
-    });
-    
-    text += `\nJACKPOTS\n`;
-    Object.entries(data.jackpots).forEach(([id, amount]) => {
-      if (amount) text += `${id}: ${amount}\n`;
-    });
-    
-    text += `\nINTERACTIONS\n`;
-    text += `Gaming:\n`;
-    data.logs.gaming.forEach(log => {
-      if (log.time && log.note) text += `${log.time}: ${log.note}\n`;
-    });
-    
-    text += `Bar:\n`;
-    data.logs.bar.forEach(log => {
-      if (log.time && log.note) text += `${log.time}: ${log.note}\n`;
-    });
-    
-    text += `Incidents:\n`;
-    data.logs.incidents.forEach(log => {
-      if (log.time && log.note) text += `${log.time}: ${log.note}\n`;
-    });
-    
-    return text;
-  }
-
-  // Jackpot names editor (fix: stable keys + don't mutate id while typing)
-  function startEditNames(){ setEditingNames(true); }
-  function cancelEditNames(){ setEditingNames(false); }
-  function changeName(i, value){
-    setNamesDraft(prev => {
-      const next=[...prev];
-      next[i] = { ...next[i], name:value }; // DO NOT touch id while typing
-      return next;
-    });
-  }
-  function saveNames(){
-    const cleaned = namesDraft
-      .map(j => ({ id: slug(j.name || j.id), name: (j.name ?? "").trim() }))
-      .filter(j => j.name);
-    setJackpotTemplate(cleaned);
-    localStorage.setItem(LSK_JACKPOTS, JSON.stringify(cleaned));
-    setEditingNames(false);
-  }
-
   /** ========= Render ========= */
   return (
     <>
@@ -542,7 +414,7 @@ export default function App() {
         <div className="card">
           <h1>LevelUP Shift Report</h1>
 
-          {/* Date / Weather (no time) */}
+          {/* Date / Weather */}
           <div className="info">
             <div className="infoCard">{sydDate || "Sydney date loading…"}</div>
             <div className="infoCard">
@@ -551,48 +423,12 @@ export default function App() {
             </div>
           </div>
 
-          {/* ROSTER (3 side-by-side cards) */}
-          <div className="rosterGrid">
-            <div className="rosterCard">
-              <h3>Managers</h3>
-              {["open","mid","close"].map(shift=>(
-                <div className="row" key={`mgr-${shift}`}>
-                  <div style={{minWidth:80, opacity:.95, textTransform:"capitalize"}}>{shift}</div>
-                  <input placeholder="Name"
-                         value={roster.managers[shift].names}
-                         onChange={e=>updateRoster("managers", shift, e.target.value)} />
-                </div>
-              ))}
-            </div>
-
-            <div className="rosterCard">
-              <h3>Staffs</h3>
-              {["open","mid","close"].map(shift=>(
-                <div className="row" key={`stf-${shift}`}>
-                  <div style={{minWidth:80, opacity:.95, textTransform:"capitalize"}}>{shift}</div>
-                  <input placeholder="Name"
-                         value={roster.staffs[shift].names}
-                         onChange={e=>updateRoster("staffs", shift, e.target.value)} />
-                </div>
-              ))}
-            </div>
-
-            <div className="rosterCard">
-              <h3>Security on Duty</h3>
-              <div className="row">
-                <div style={{minWidth:80}}>Shift</div>
-                <input placeholder="Name"
-                       value={roster.security.shift}
-                       onChange={e=>updateSecurity("shift", e.target.value)} />
-              </div>
-              <div className="row" style={{marginTop:8}}>
-                <div style={{minWidth:80}}>Names</div>
-                <input placeholder="Name"
-                       value={roster.security.names}
-                       onChange={e=>updateSecurity("names", e.target.value)} />
-              </div>
-            </div>
-          </div>
+          {/* ROSTER */}
+          <RosterSection 
+            roster={reportRoster}
+            onUpdateRoster={updateRoster}
+            onUpdateSecurity={updateSecurity}
+          />
 
           <div className="divider" />
 
@@ -610,7 +446,7 @@ export default function App() {
                 </tr>
               </thead>
               <tbody>
-                {rows.map((r,i)=>(
+                {reportRows.map((r,i)=>(
                   <tr key={r.hour}>
                     <td>{r.hour}</td>
                     <td>
@@ -648,161 +484,44 @@ export default function App() {
 
           <div className="divider" />
 
-          {/* Interactions (stacked) */}
-          <h2 className="muted" style={{textAlign:"left", margin:0}}>Interactions</h2>
-          <div className="logWrap" style={{marginTop:8}}>
-            {/* Gaming */}
-            <div className="logCard">
-              <h3>Gaming Interaction</h3>
-              {logs.gaming.map((row,i)=>(
-                <div className="logEntry" key={`g-${i}`}>
-                  <select className="timeSel" value={row.time}
-                          onChange={e=>updateLog("gaming",i,"time",e.target.value)}>
-                    <option value="">Time…</option>
-                    {TIME_OPTIONS.map(t=><option key={`gt-${t}`} value={t}>{t}</option>)}
-                  </select>
-                  <textarea placeholder="Interaction details…" value={row.note}
-                            onChange={e=>{updateLog("gaming",i,"note",e.target.value); autosize(e.target);}}
-                            ref={el=>el&&autosize(el)} />
-                  <button className="removeBtn" onClick={()=>removeLog("gaming",i)}>×</button>
-                </div>
-              ))}
-              <button className="addRowBtn" onClick={()=>addLogRow("gaming")}>+ Add gaming interaction</button>
-            </div>
-
-            {/* Bar */}
-            <div className="logCard">
-              <h3>Bar Interaction</h3>
-              {logs.bar.map((row,i)=>(
-                <div className="logEntry" key={`b-${i}`}>
-                  <select className="timeSel" value={row.time}
-                          onChange={e=>updateLog("bar",i,"time",e.target.value)}>
-                    <option value="">Time…</option>
-                    {TIME_OPTIONS.map(t=><option key={`bt-${t}`} value={t}>{t}</option>)}
-                  </select>
-                  <textarea placeholder="Interaction details…" value={row.note}
-                            onChange={e=>{updateLog("bar",i,"note",e.target.value); autosize(e.target);}}
-                            ref={el=>el&&autosize(el)} />
-                  <button className="removeBtn" onClick={()=>removeLog("bar",i)}>×</button>
-                </div>
-              ))}
-              <button className="addRowBtn" onClick={()=>addLogRow("bar")}>+ Add bar interaction</button>
-            </div>
-
-            {/* Incidents */}
-            <div className="logCard">
-              <h3>Incidents (throughout the night)</h3>
-              {logs.incidents.map((row,i)=>(
-                <div className="logEntry" key={`i-${i}`}>
-                  <select className="timeSel" value={row.time}
-                          onChange={e=>updateLog("incidents",i,"time",e.target.value)}>
-                    <option value="">Time…</option>
-                    {TIME_OPTIONS.map(t=><option key={`it-${t}`} value={t}>{t}</option>)}
-                  </select>
-                  <textarea placeholder="Incident details…" value={row.note}
-                            onChange={e=>{updateLog("incidents",i,"note",e.target.value); autosize(e.target);}}
-                            ref={el=>el&&autosize(el)} />
-                  <button className="removeBtn" onClick={()=>removeLog("incidents",i)}>×</button>
-                </div>
-              ))}
-              <button className="addRowBtn" onClick={()=>addLogRow("incidents")}>+ Add incident</button>
-            </div>
-          </div>
+          {/* Interactions */}
+          <LogSection 
+            logs={reportLogs}
+            onUpdateLog={updateLog}
+            onAddLogRow={addLogRow}
+            onRemoveLog={removeLog}
+          />
 
           <div className="divider" />
 
-          {/* Link Jackpots (3 columns, editable names) */}
-          <div className="jackpotsHeader" style={{marginTop:18}}>
-            <h2 style={{margin:0}}>Link Jackpots</h2>
-            {!editingNames ? (
-              <button className="btn" onClick={startEditNames}>Edit jackpot names</button>
-            ) : (
-              <div className="editBar">
-                <button className="btn gradient" onClick={saveNames}>Save names</button>
-                <button className="btn ghost" onClick={cancelEditNames}>Cancel</button>
-              </div>
-            )}
-          </div>
-          {!editingNames && (
-            <div className="muted" style={{textAlign:"left", marginTop:6}}>
-              Jackpot names are fixed. Enter amounts for this shift.
-            </div>
-          )}
-
-          <div className="jGrid" style={{marginTop:12}}>
-            {(editingNames ? namesDraft : jackpotTemplate).map((j, idx) => (
-              <div
-                className="jItem"
-                key={editingNames ? idx : (j.id || idx)}  // stable while editing
-              >
-                <div className="jName">
-                  {!editingNames ? (
-                    j.name
-                  ) : (
-                    <input className="editField" value={j.name}
-                           onChange={e=>changeName(idx, e.target.value)} />
-                  )}
-                </div>
-                <div className="jAmount">
-                  {!editingNames ? (
-                    <input placeholder="$"
-                           value={jackpots[j.id] || ""}
-                           onChange={e=>updateJackpotAmount(j.id, e.target.value)}
-                           onBlur={()=>formatJackpotOnBlur(j.id)} />
-                  ) : (
-                    <input disabled placeholder="$ (disabled while editing names)" />
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
+          {/* Jackpots */}
+          <JackpotsSection
+            jackpotTemplate={jackpotTemplate}
+            namesDraft={namesDraft}
+            editingNames={editingNames}
+            jackpots={reportJackpots}
+            onStartEditNames={startEditNames}
+            onCancelEditNames={cancelEditNames}
+            onSaveNames={saveNames}
+            onChangeName={changeName}
+            onUpdateAmount={updateJackpotAmount}
+            onFormatAmount={formatJackpotOnBlur}
+          />
 
           <div className="divider" />
 
-          {/* Ethnicity chips (VM only) AT THE END */}
-          <div className="jackpotsHeader" style={{marginTop:16}}>
-            <h2 style={{margin:0}}>Ethnicity Chips <span className="muted" style={{fontSize:14}}>(VM only)</span></h2>
-            {!editingEth ? (
-              <button className="btn" onClick={startEditEth}>Edit ethnicity names</button>
-            ) : (
-              <div className="editBar">
-                <button className="btn gradient" onClick={saveEth}>Save names</button>
-                <button className="btn ghost" onClick={cancelEditEth}>Cancel</button>
-              </div>
-            )}
-          </div>
-          {!editingEth && (
-            <div className="muted" style={{textAlign:"left", marginTop:6}}>
-              These are the quick-select options used in the VIP Mix drawer.
-            </div>
-          )}
-          <div className="jGrid" style={{marginTop:12}}>
-            {(editingEth ? ethDraft : ethnicityTemplate).map((e, idx) => (
-              <div
-                className="jItem"
-                key={editingEth ? idx : (e.key || idx)}   
-              >
-                <div className="jName">
-                  {!editingEth ? (
-                    e.key
-                  ) : (
-                    <input className="editField" value={e.key}
-                           onChange={ev=>changeEthName(idx, ev.target.value)} />
-                  )}
-                </div>
-                <div className="jAmount">
-                  {!editingEth ? (
-                    <input disabled placeholder="(used in VIP editor)" />
-                  ) : (
-                    <div className="editBar">
-                      <button className="btn ghost" onClick={()=>removeEthRow(idx)}>Remove</button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-          {editingEth && <button className="addRowBtn" onClick={addEthRow}>+ Add ethnicity chip</button>}
+          {/* Ethnicity Editor */}
+          <EthnicityEditor
+            ethnicityTemplate={ethnicityTemplate}
+            ethDraft={ethDraft}
+            editingEth={editingEth}
+            onStartEditEth={startEditEth}
+            onCancelEditEth={cancelEditEth}
+            onSaveEth={saveEth}
+            onChangeEthName={changeEthName}
+            onAddEthRow={addEthRow}
+            onRemoveEthRow={removeEthRow}
+          />
 
           {/* Footer */}
           <div className="footer">
@@ -814,43 +533,18 @@ export default function App() {
       </div>
 
       {/* VIP Edit Drawer */}
-      {editing !== null && (
-        <div className="drawer" onClick={()=>setEditing(null)} style={{background:"#0006", position:"fixed", inset:0, display:"flex", alignItems:"center", justifyContent:"center", padding:20}}>
-          <div className="sheet" onClick={e=>e.stopPropagation()} style={{width:680, maxWidth:"100%", background:"#1f1637cc", border:"1px solid var(--line)", borderRadius:16, padding:18, backdropFilter:"blur(10px)", position:"relative"}}>
-            <button className="btn ghost" style={{position:"absolute", right:18, top:14}} onClick={()=>setEditing(null)}>Close</button>
-            <h3 style={{margin:"0 0 8px"}}>Edit VIP Mix — {rows[editing].hour}</h3>
-
-            <div className="row" style={{marginTop:8, alignItems:"flex-end"}}>
-              <div style={{minWidth:260, flex:1}}>
-                <label>Ethnicity</label>
-                <select style={{width:"100%"}} value={editEthnicity} onChange={e=>setEditEthnicity(e.target.value)}>
-                  {ethnicityTemplate.map(e => <option key={e.key} value={e.key}>{e.key}</option>)}
-                </select>
-              </div>
-              <div style={{minWidth:160}}>
-                <label>Count</label>
-                <input placeholder="2" value={editCount} onChange={e=>setEditCount(e.target.value)} />
-              </div>
-              <button className="btn gradient" onClick={addVip}>Add</button>
-            </div>
-
-            <div style={{marginTop:12}}>
-              {(Object.entries(rows[editing].vip || {}).length === 0) ? (
-                <div className="muted">No VIP entries yet.</div>
-              ) : (
-                <div style={{display:"flex", flexWrap:"wrap"}}>
-                  {Object.entries(rows[editing].vip).map(([k,v])=>(
-                    <span key={k} className="chip">
-                      <b>{k}:</b> {v}
-                      <button className="btn ghost" style={{padding:"4px 8px", marginLeft:8}} onClick={()=>removeVip(k)}>remove</button>
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      <VipDrawer
+        editing={editing}
+        rows={reportRows}
+        ethnicityTemplate={ethnicityTemplate}
+        editEthnicity={editEthnicity}
+        editCount={editCount}
+        onClose={() => setEditing(null)}
+        onSetEditEthnicity={setEditEthnicity}
+        onSetEditCount={setEditCount}
+        onAddVip={addVip}
+        onRemoveVip={removeVip}
+      />
     </>
   );
 }
