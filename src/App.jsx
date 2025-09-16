@@ -370,19 +370,19 @@ export default function App() {
               border-radius: 15px;
               padding: 30px;
               box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-              margin: 20px auto;
+              margin: 20px;
               max-width: 800px;
             }
             h1 { 
               color: #667eea; 
-              text-align: center; 
+              text-align: left; 
               font-size: 32px; 
               margin-bottom: 10px;
               text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
             }
             h2 { 
               color: #764ba2; 
-              text-align: center; 
+              text-align: left; 
               font-size: 20px; 
               margin-bottom: 20px;
             }
@@ -399,8 +399,8 @@ export default function App() {
               margin: 20px 0 10px 0;
             }
             .roster-tables {
-              margin-left: 50px;
-              max-width: 400px;
+              margin-left: 0;
+              max-width: 100%;
             }
             table { 
               border-collapse: collapse; 
