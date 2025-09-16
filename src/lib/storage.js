@@ -46,10 +46,6 @@ export function clearFromStorage(key) {
 export function loadReportData(defaultRows) {
   const saved = loadFromStorage(LSK_REPORT);
   if (saved) {
-    if (Array.isArray(saved)) {
-      // Legacy format - just rows
-      return { rows: saved, roster: getDefaultRoster(), logs: getDefaultLogs(), jackpots: {} };
-    }
     return {
       rows: saved.rows || defaultRows,
       roster: { ...getDefaultRoster(), ...saved.roster },
