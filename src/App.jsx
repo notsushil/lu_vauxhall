@@ -372,19 +372,41 @@ export default function App() {
           ${data.weather ? `<p><strong>Weather:</strong> ${data.weather.temp}°C - ${data.weather.desc}</p>` : ''}
           
           <h3>Roster</h3>
+          
           <h4>Managers</h4>
-          <p><strong>Open:</strong> ${data.roster.managers.open.names || 'Not specified'}</p>
-          <p><strong>Mid:</strong> ${data.roster.managers.mid.names || 'Not specified'}</p>
-          <p><strong>Close:</strong> ${data.roster.managers.close.names || 'Not specified'}</p>
+          <table>
+            <thead>
+              <tr><th>Shift</th><th>Names</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Open</td><td>${data.roster.managers.open.names || 'Not specified'}</td></tr>
+              <tr><td>Mid</td><td>${data.roster.managers.mid.names || 'Not specified'}</td></tr>
+              <tr><td>Close</td><td>${data.roster.managers.close.names || 'Not specified'}</td></tr>
+            </tbody>
+          </table>
           
           <h4>Staff</h4>
-          <p><strong>Open:</strong> ${data.roster.staffs.open.names || 'Not specified'}</p>
-          <p><strong>Mid:</strong> ${data.roster.staffs.mid.names || 'Not specified'}</p>
-          <p><strong>Close:</strong> ${data.roster.staffs.close.names || 'Not specified'}</p>
+          <table>
+            <thead>
+              <tr><th>Shift</th><th>Names</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Open</td><td>${data.roster.staffs.open.names || 'Not specified'}</td></tr>
+              <tr><td>Mid</td><td>${data.roster.staffs.mid.names || 'Not specified'}</td></tr>
+              <tr><td>Close</td><td>${data.roster.staffs.close.names || 'Not specified'}</td></tr>
+            </tbody>
+          </table>
           
           <h4>Security</h4>
-          <p><strong>Shift:</strong> ${data.roster.security.shift || 'Not specified'}</p>
-          <p><strong>Names:</strong> ${data.roster.security.names || 'Not specified'}</p>
+          <table>
+            <thead>
+              <tr><th>Type</th><th>Details</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Shift</td><td>${data.roster.security.shift || 'Not specified'}</td></tr>
+              <tr><td>Names</td><td>${data.roster.security.names || 'Not specified'}</td></tr>
+            </tbody>
+          </table>
           
           <h3>Hourly Data</h3>
           <table>
