@@ -359,54 +359,128 @@ export default function App() {
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>LevelUP Shift Report</title>
           <style>
-            body { font-family: Arial, sans-serif; margin: 20px; }
-            table { border-collapse: collapse; width: 100%; margin: 10px 0; }
-            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-            th { background-color: #f2f2f2; }
-            h1, h2, h3, h4 { color: #333; }
+            body { 
+              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+              margin: 20px; 
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              color: #333;
+            }
+            .email-container {
+              background: white;
+              border-radius: 15px;
+              padding: 30px;
+              box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+              margin: 20px auto;
+              max-width: 800px;
+            }
+            h1 { 
+              color: #667eea; 
+              text-align: center; 
+              font-size: 32px; 
+              margin-bottom: 10px;
+              text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            }
+            h2 { 
+              color: #764ba2; 
+              text-align: center; 
+              font-size: 20px; 
+              margin-bottom: 20px;
+            }
+            h3 { 
+              color: #667eea; 
+              font-size: 22px; 
+              margin: 25px 0 15px 0;
+              border-bottom: 3px solid #667eea;
+              padding-bottom: 5px;
+            }
+            h4 { 
+              color: #764ba2; 
+              font-size: 18px; 
+              margin: 20px 0 10px 0;
+            }
+            .roster-tables {
+              margin-left: 50px;
+              max-width: 400px;
+            }
+            table { 
+              border-collapse: collapse; 
+              width: 100%; 
+              margin: 15px 0; 
+              border-radius: 8px;
+              overflow: hidden;
+              box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            }
+            th, td { 
+              border: 1px solid #e0e0e0; 
+              padding: 12px; 
+              text-align: left; 
+            }
+            th { 
+              background: linear-gradient(135deg, #667eea, #764ba2); 
+              color: white; 
+              font-weight: bold;
+              text-transform: uppercase;
+              font-size: 14px;
+            }
+            td {
+              background-color: #f8f9ff;
+            }
+            tr:nth-child(even) td {
+              background-color: #f0f2ff;
+            }
+            .weather-info {
+              background: linear-gradient(135deg, #ffecd2, #fcb69f);
+              padding: 15px;
+              border-radius: 10px;
+              margin: 20px 0;
+              text-align: center;
+              font-weight: bold;
+            }
           </style>
         </head>
         <body>
-          <h1>LevelUP Shift Report</h1>
-          <h2>${data.date}</h2>
-          ${data.weather ? `<p><strong>Weather:</strong> ${data.weather.temp}°C - ${data.weather.desc}</p>` : ''}
-          
-          <h3>Roster</h3>
-          
-          <h4>Managers</h4>
-          <table>
-            <thead>
-              <tr><th>Shift</th><th>Names</th></tr>
-            </thead>
-            <tbody>
-              <tr><td>Open</td><td>${data.roster.managers.open.names || 'Not specified'}</td></tr>
-              <tr><td>Mid</td><td>${data.roster.managers.mid.names || 'Not specified'}</td></tr>
-              <tr><td>Close</td><td>${data.roster.managers.close.names || 'Not specified'}</td></tr>
-            </tbody>
-          </table>
-          
-          <h4>Staff</h4>
-          <table>
-            <thead>
-              <tr><th>Shift</th><th>Names</th></tr>
-            </thead>
-            <tbody>
-              <tr><td>Open</td><td>${data.roster.staffs.open.names || 'Not specified'}</td></tr>
-              <tr><td>Mid</td><td>${data.roster.staffs.mid.names || 'Not specified'}</td></tr>
-              <tr><td>Close</td><td>${data.roster.staffs.close.names || 'Not specified'}</td></tr>
-            </tbody>
-          </table>
-          
-          <h4>Security</h4>
-          <table>
-            <thead>
-              <tr><th>Type</th><th>Details</th></tr>
-            </thead>
-            <tbody>
-              <tr><td>Shift</td><td>${data.roster.security.shift || 'Not specified'}</td></tr>
-              <tr><td>Names</td><td>${data.roster.security.names || 'Not specified'}</td></tr>
-            </tbody>
-          </table>
+          <div class="email-container">
+            <h1>LevelUP Shift Report</h1>
+            <h2>${data.date}</h2>
+            ${data.weather ? `<div class="weather-info">🌤️ Weather: ${data.weather.temp}°C - ${data.weather.desc}</div>` : ''}
+            
+            <h3>Roster</h3>
+            <div class="roster-tables">
+              <h4>Managers</h4>
+              <table>
+                <thead>
+                  <tr><th>Shift</th><th>Names</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Open</td><td>${data.roster.managers.open.names || 'Not specified'}</td></tr>
+                  <tr><td>Mid</td><td>${data.roster.managers.mid.names || 'Not specified'}</td></tr>
+                  <tr><td>Close</td><td>${data.roster.managers.close.names || 'Not specified'}</td></tr>
+                </tbody>
+              </table>
+              
+              <h4>Staff</h4>
+              <table>
+                <thead>
+                  <tr><th>Shift</th><th>Names</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Open</td><td>${data.roster.staffs.open.names || 'Not specified'}</td></tr>
+                  <tr><td>Mid</td><td>${data.roster.staffs.mid.names || 'Not specified'}</td></tr>
+                  <tr><td>Close</td><td>${data.roster.staffs.close.names || 'Not specified'}</td></tr>
+                </tbody>
+              </table>
+              
+              <h4>Security</h4>
+              <table>
+                <thead>
+                  <tr><th>Type</th><th>Details</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Shift</td><td>${data.roster.security.shift || 'Not specified'}</td></tr>
+                  <tr><td>Names</td><td>${data.roster.security.names || 'Not specified'}</td></tr>
+                </tbody>
+              </table>
+            </div>
           
           <h3>Hourly Data</h3>
           <table>
@@ -451,6 +525,7 @@ export default function App() {
             data.logs.incidents.map(log => `<p><strong>${log.time}:</strong> ${log.note}</p>`).join('') : 
             '<p>No incidents recorded</p>'
           }
+          </div>
         </body>
       </html>
     `;
