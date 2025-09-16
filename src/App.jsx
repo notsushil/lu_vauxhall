@@ -352,55 +352,83 @@ export default function App() {
   // Generate HTML content for the report
   function generateReportHTML(data) {
     return `
+      <!DOCTYPE html>
       <html>
-        <head><title>LevelUP Shift Report</title></head>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>LevelUP Shift Report</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #f2f2f2; }
+            h1, h2, h3, h4 { color: #333; }
+          </style>
+        </head>
         <body>
           <h1>LevelUP Shift Report</h1>
           <h2>${data.date}</h2>
-          ${data.weather ? `<p>Weather: ${data.weather.temp}°C - ${data.weather.desc}</p>` : ''}
+          ${data.weather ? `<p><strong>Weather:</strong> ${data.weather.temp}°C - ${data.weather.desc}</p>` : ''}
           
           <h3>Roster</h3>
           <h4>Managers</h4>
-          <p>Open: ${data.roster.managers.open.names}</p>
-          <p>Mid: ${data.roster.managers.mid.names}</p>
-          <p>Close: ${data.roster.managers.close.names}</p>
+          <p><strong>Open:</strong> ${data.roster.managers.open.names || 'Not specified'}</p>
+          <p><strong>Mid:</strong> ${data.roster.managers.mid.names || 'Not specified'}</p>
+          <p><strong>Close:</strong> ${data.roster.managers.close.names || 'Not specified'}</p>
           
           <h4>Staff</h4>
-          <p>Open: ${data.roster.staffs.open.names}</p>
-          <p>Mid: ${data.roster.staffs.mid.names}</p>
-          <p>Close: ${data.roster.staffs.close.names}</p>
+          <p><strong>Open:</strong> ${data.roster.staffs.open.names || 'Not specified'}</p>
+          <p><strong>Mid:</strong> ${data.roster.staffs.mid.names || 'Not specified'}</p>
+          <p><strong>Close:</strong> ${data.roster.staffs.close.names || 'Not specified'}</p>
           
           <h4>Security</h4>
-          <p>Shift: ${data.roster.security.shift}</p>
-          <p>Names: ${data.roster.security.names}</p>
+          <p><strong>Shift:</strong> ${data.roster.security.shift || 'Not specified'}</p>
+          <p><strong>Names:</strong> ${data.roster.security.names || 'Not specified'}</p>
           
           <h3>Hourly Data</h3>
-          <table border="1">
-            <tr><th>Time</th><th>Turnover</th><th>EGM</th><th>VIP Mix</th></tr>
-            ${data.rows.map(row => `
-              <tr>
-                <td>${row.hour}</td>
-                <td>${row.turnover}</td>
-                <td>${row.egm}</td>
-                <td>${Object.entries(row.vip || {}).map(([k,v]) => `${k}: ${v}`).join(', ')}</td>
-              </tr>
-            `).join('')}
+          <table>
+            <thead>
+              <tr><th>Time</th><th>Turnover</th><th>EGM</th><th>VIP Mix</th></tr>
+            </thead>
+            <tbody>
+              ${data.rows.map(row => `
+                <tr>
+                  <td>${row.hour}</td>
+                  <td>${row.turnover || ''}</td>
+                  <td>${row.egm || ''}</td>
+                  <td>${Object.entries(row.vip || {}).map(([k,v]) => `${k}: ${v}`).join(', ') || ''}</td>
+                </tr>
+              `).join('')}
+            </tbody>
           </table>
           
           <h3>Jackpots</h3>
-          ${Object.entries(data.jackpots).map(([id, amount]) => 
-            `<p>${id}: ${amount}</p>`
-          ).join('')}
+          ${Object.entries(data.jackpots).length > 0 ? 
+            Object.entries(data.jackpots).map(([id, amount]) => 
+              `<p><strong>${id}:</strong> ${amount || 'Not specified'}</p>`
+            ).join('') : 
+            '<p>No jackpots recorded</p>'
+          }
           
           <h3>Interactions</h3>
           <h4>Gaming</h4>
-          ${data.logs.gaming.map(log => `<p>${log.time}: ${log.note}</p>`).join('')}
+          ${data.logs.gaming.length > 0 ? 
+            data.logs.gaming.map(log => `<p><strong>${log.time}:</strong> ${log.note}</p>`).join('') : 
+            '<p>No gaming interactions recorded</p>'
+          }
           
           <h4>Bar</h4>
-          ${data.logs.bar.map(log => `<p>${log.time}: ${log.note}</p>`).join('')}
+          ${data.logs.bar.length > 0 ? 
+            data.logs.bar.map(log => `<p><strong>${log.time}:</strong> ${log.note}</p>`).join('') : 
+            '<p>No bar interactions recorded</p>'
+          }
           
           <h4>Incidents</h4>
-          ${data.logs.incidents.map(log => `<p>${log.time}: ${log.note}</p>`).join('')}
+          ${data.logs.incidents.length > 0 ? 
+            data.logs.incidents.map(log => `<p><strong>${log.time}:</strong> ${log.note}</p>`).join('') : 
+            '<p>No incidents recorded</p>'
+          }
         </body>
       </html>
     `;
