@@ -517,30 +517,49 @@ export default function App() {
             
             .jackpots-grid {
               display: grid;
-              grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-              gap: 15px;
+              grid-template-columns: repeat(3, 1fr);
+              gap: 20px;
               margin: 20px 0;
             }
             
             .jackpot-item {
               background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
-              padding: 20px;
-              border-radius: 12px;
-              border-left: 4px solid #0ea5e9;
-              box-shadow: 0 2px 8px rgba(14, 165, 233, 0.1);
+              padding: 24px 20px;
+              border-radius: 16px;
+              border-left: 5px solid #0ea5e9;
+              box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15);
+              text-align: center;
+              transition: transform 0.2s ease, box-shadow 0.2s ease;
             }
             
-            .jackpot-item strong {
+            .jackpot-item:hover {
+              transform: translateY(-2px);
+              box-shadow: 0 6px 20px rgba(14, 165, 233, 0.2);
+            }
+            
+            .jackpot-name {
               color: #0c4a6e;
-              font-size: 16px;
-              display: block;
-              margin-bottom: 5px;
+              font-size: 14px;
+              font-weight: 600;
+              margin-bottom: 8px;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              line-height: 1.3;
             }
             
             .jackpot-amount {
               color: #0ea5e9;
-              font-size: 20px;
-              font-weight: 700;
+              font-size: 24px;
+              font-weight: 800;
+              margin-top: 8px;
+              text-shadow: 0 1px 2px rgba(14, 165, 233, 0.2);
+            }
+            
+            .jackpot-icon {
+              font-size: 32px;
+              margin-bottom: 12px;
+              display: block;
+              filter: drop-shadow(0 2px 4px rgba(14, 165, 233, 0.3));
             }
             
             .interactions-section {
@@ -674,7 +693,27 @@ export default function App() {
                 min-width: auto;
               }
               
-              .jackpots-grid,
+              .jackpots-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+              }
+              
+              .jackpot-item {
+                padding: 20px 16px;
+              }
+              
+              .jackpot-icon {
+                font-size: 28px;
+              }
+              
+              .jackpot-name {
+                font-size: 13px;
+              }
+              
+              .jackpot-amount {
+                font-size: 20px;
+              }
+              
               .variance-grid {
                 grid-template-columns: 1fr;
               }
@@ -762,7 +801,8 @@ export default function App() {
                 ${Object.entries(data.jackpots).length > 0 ? 
                   Object.entries(data.jackpots).map(([id, amount]) => 
                     `<div class="jackpot-item">
-                      <strong>${id}</strong>
+                      <span class="jackpot-icon">🎰</span>
+                      <div class="jackpot-name">${id.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</div>
                       <div class="jackpot-amount">${amount || "Not specified"}</div>
                     </div>`
                   ).join("") : 
