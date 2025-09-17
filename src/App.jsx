@@ -703,22 +703,25 @@ export default function App() {
             </div>
             
             <h3>Cash Variance</h3>
-            <div class="cash-variance-section">
-              <div class="variance-grid">
-                <div class="variance-item">
-                  <label>Cash Variances</label>
-                  <input type="text" value="${data.securityPerformance.cashVariance || 'Nil'}" readonly />
-                </div>
-                <div class="variance-item">
-                  <label>Trade Float Variances</label>
-                  <input type="text" value="${data.securityPerformance.tradeFloatVariance || 'Nil'}" readonly />
-                </div>
-                <div class="variance-item">
-                  <label>Gaming Float Variances</label>
-                  <input type="text" value="${data.securityPerformance.gamingFloatVariance || 'Nil'}" readonly />
-                </div>
-              </div>
-            </div>
+            <table>
+              <thead>
+                <tr><th>Variance Type</th><th>Amount</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Cash Variance</td>
+                  <td>${data.securityPerformance.cashVariance || "Nil"}</td>
+                </tr>
+                <tr>
+                  <td>Trade Float Variance</td>
+                  <td>${data.securityPerformance.tradeFloatVariance || "Nil"}</td>
+                </tr>
+                <tr>
+                  <td>Gaming Float Variance</td>
+                  <td>${data.securityPerformance.gamingFloatVariance || "Nil"}</td>
+                </tr>
+              </tbody>
+            </table>
             
             ${data.securityPerformance.additionalNotes ? `
               <h3>Additional Notes</h3>
