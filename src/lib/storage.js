@@ -91,7 +91,8 @@ export function getDefaultSecurityPerformance() {
   return {
     cashVariance: "",
     tradeFloatVariance: "",
-    gamingFloatVariance: ""
+    gamingFloatVariance: "",
+    additionalNotes: ""
   };
 }
 

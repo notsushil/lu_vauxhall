@@ -534,7 +534,6 @@ export default function App() {
           }
           
           <h3>Security Performance</h3>
-          <h4>Cash</h4>
           <table>
             <thead>
               <tr><th>Cash Control Area</th><th>Variance</th></tr>
@@ -545,6 +544,11 @@ export default function App() {
               <tr><td>Gaming Float Variance</td><td>${data.securityPerformance.gamingFloatVariance || 'Nil'}</td></tr>
             </tbody>
           </table>
+          
+          ${data.securityPerformance.additionalNotes ? `
+            <h4>Additional Notes</h4>
+            <p>${data.securityPerformance.additionalNotes}</p>
+          ` : ''}
           </div>
         </body>
       </html>
@@ -629,16 +633,6 @@ export default function App() {
 
           <div className="divider" />
 
-          {/* Interactions */}
-          <LogSection 
-            logs={reportLogs}
-            onUpdateLog={updateLog}
-            onAddLogRow={addLogRow}
-            onRemoveLog={removeLog}
-          />
-
-          <div className="divider" />
-
           {/* Jackpots */}
           <JackpotsSection
             jackpotTemplate={jackpotTemplate}
@@ -655,35 +649,54 @@ export default function App() {
 
           <div className="divider" />
 
+          {/* Interactions */}
+          <LogSection 
+            logs={reportLogs}
+            onUpdateLog={updateLog}
+            onAddLogRow={addLogRow}
+            onRemoveLog={removeLog}
+          />
+
+          <div className="divider" />
+
           {/* Security Performance */}
-          <div className="logWrap">
-            <div className="logCard">
+          <div className="rosterGrid">
+            <div className="rosterCard">
               <h3>Security Performance</h3>
-              <h4>Cash Variance</h4>
               <div className="row">
-                <label>Cash Variance:</label>
+                <div style={{ minWidth: 120, opacity: 0.95 }}>Cash Variance:</div>
                 <input 
-                  placeholder="Enter cash variance"
+                  placeholder="-$58"
                   value={reportSecurityPerformance.cashVariance}
                   onChange={e => updateSecurityPerformance("cashVariance", e.target.value)} 
                 />
               </div>
               <div className="row">
-                <label>Trade Float Variance:</label>
+                <div style={{ minWidth: 120, opacity: 0.95 }}>Trade Float Variance:</div>
                 <input 
-                  placeholder="Enter trade float variance"
+                  placeholder="-$58"
                   value={reportSecurityPerformance.tradeFloatVariance}
                   onChange={e => updateSecurityPerformance("tradeFloatVariance", e.target.value)} 
                 />
               </div>
               <div className="row">
-                <label>Gaming Float Variance:</label>
+                <div style={{ minWidth: 120, opacity: 0.95 }}>Gaming Float Variance:</div>
                 <input 
-                  placeholder="Enter gaming float variance"
+                  placeholder="-$58"
                   value={reportSecurityPerformance.gamingFloatVariance}
                   onChange={e => updateSecurityPerformance("gamingFloatVariance", e.target.value)} 
                 />
               </div>
+            </div>
+            
+            <div className="rosterCard">
+              <h3>Additional Notes</h3>
+              <textarea 
+                placeholder="Enter any additional security performance notes..."
+                value={reportSecurityPerformance.additionalNotes || ""}
+                onChange={e => updateSecurityPerformance("additionalNotes", e.target.value)}
+                style={{ minHeight: 100 }}
+              />
             </div>
           </div>
 
