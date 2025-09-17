@@ -42,7 +42,7 @@ export function clearFromStorage(key) {
 
 /** ========= Specific Data Loaders ========= */
 
-// Load report data (rows, roster, logs, jackpots)
+// Load report data (rows, roster, logs, jackpots, securityPerformance)
 export function loadReportData(defaultRows) {
   const saved = loadFromStorage(LSK_REPORT);
   if (saved) {
@@ -50,10 +50,17 @@ export function loadReportData(defaultRows) {
       rows: saved.rows || defaultRows,
       roster: { ...getDefaultRoster(), ...saved.roster },
       logs: saved.logs || getDefaultLogs(),
-      jackpots: saved.jackpots || {}
+      jackpots: saved.jackpots || {},
+      securityPerformance: { ...getDefaultSecurityPerformance(), ...saved.securityPerformance }
     };
   }
-  return { rows: defaultRows, roster: getDefaultRoster(), logs: getDefaultLogs(), jackpots: {} };
+  return { 
+    rows: defaultRows, 
+    roster: getDefaultRoster(), 
+    logs: getDefaultLogs(), 
+    jackpots: {},
+    securityPerformance: getDefaultSecurityPerformance()
+  };
 }
 
 // Load jackpot template
@@ -78,6 +85,14 @@ export function getDefaultRoster() {
 
 export function getDefaultLogs() {
   return { gaming: [], bar: [], incidents: [] };
+}
+
+export function getDefaultSecurityPerformance() {
+  return {
+    cashVariance: "",
+    tradeFloatVariance: "",
+    gamingFloatVariance: ""
+  };
 }
 
 /** ========= Save Operations ========= */

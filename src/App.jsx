@@ -13,7 +13,8 @@ import {
   saveEthnicityTemplate,
   clearReportData,
   getDefaultRoster,
-  getDefaultLogs
+  getDefaultLogs,
+  getDefaultSecurityPerformance
 } from "./lib/storage.js";
 import { DEFAULT_JACKPOT_TEMPLATE, DEFAULT_ETHNICITY_TEMPLATE } from "./lib/constants.js";
 
@@ -148,11 +149,12 @@ export default function App() {
 
   /** Load Data from Storage */
   const defaultRows = HOURS.map(emptyRow);
-  const { rows, roster, logs, jackpots } = loadReportData(defaultRows);
+  const { rows, roster, logs, jackpots, securityPerformance } = loadReportData(defaultRows);
   const [reportRows, setReportRows] = useState(rows);
   const [reportRoster, setReportRoster] = useState(roster);
   const [reportLogs, setReportLogs] = useState(logs);
   const [reportJackpots, setReportJackpots] = useState(jackpots);
+  const [reportSecurityPerformance, setReportSecurityPerformance] = useState(securityPerformance);
 
   /** Templates */
   const [ethnicityTemplate, setEthnicityTemplate] = useState(() => 
@@ -264,6 +266,10 @@ export default function App() {
     setReportJackpots(prev => { const raw=parseMoney(prev[id]); return { ...prev, [id]: raw ? toMoney(raw) : "" }; });
   }
 
+  function updateSecurityPerformance(field, value){
+    setReportSecurityPerformance(prev => ({ ...prev, [field]: value }));
+  }
+
   /** Template Management */
   function startEditEth(){ setEditingEth(true); }
   function cancelEditEth(){ setEditingEth(false); }
@@ -299,7 +305,7 @@ export default function App() {
   }
 
   function saveDraft(){
-    saveReportData({ rows: reportRows, roster: reportRoster, logs: reportLogs, jackpots: reportJackpots });
+    saveReportData({ rows: reportRows, roster: reportRoster, logs: reportLogs, jackpots: reportJackpots, securityPerformance: reportSecurityPerformance });
     alert("Draft saved locally.");
   }
   
@@ -318,6 +324,7 @@ export default function App() {
         roster: reportRoster,
         logs: reportLogs,
         jackpots: reportJackpots,
+        securityPerformance: reportSecurityPerformance,
         totals: totals,
         submittedAt: new Date().toISOString()
       };
@@ -533,9 +540,9 @@ export default function App() {
               <tr><th>Cash Control Area</th><th>Variance</th></tr>
             </thead>
             <tbody>
-              <tr><td>Cash Variance</td><td>Nil</td></tr>
-              <tr><td>Trade Float Variance</td><td>Nil</td></tr>
-              <tr><td>Gaming Float Variance</td><td>Nil</td></tr>
+              <tr><td>Cash Variance</td><td>${data.securityPerformance.cashVariance || 'Nil'}</td></tr>
+              <tr><td>Trade Float Variance</td><td>${data.securityPerformance.tradeFloatVariance || 'Nil'}</td></tr>
+              <tr><td>Gaming Float Variance</td><td>${data.securityPerformance.gamingFloatVariance || 'Nil'}</td></tr>
             </tbody>
           </table>
           </div>
@@ -645,6 +652,40 @@ export default function App() {
             onUpdateAmount={updateJackpotAmount}
             onFormatAmount={formatJackpotOnBlur}
           />
+
+          <div className="divider" />
+
+          {/* Security Performance */}
+          <div className="logWrap">
+            <div className="logCard">
+              <h3>Security Performance</h3>
+              <h4>Cash Variance</h4>
+              <div className="row">
+                <label>Cash Variance:</label>
+                <input 
+                  placeholder="Enter cash variance"
+                  value={reportSecurityPerformance.cashVariance}
+                  onChange={e => updateSecurityPerformance("cashVariance", e.target.value)} 
+                />
+              </div>
+              <div className="row">
+                <label>Trade Float Variance:</label>
+                <input 
+                  placeholder="Enter trade float variance"
+                  value={reportSecurityPerformance.tradeFloatVariance}
+                  onChange={e => updateSecurityPerformance("tradeFloatVariance", e.target.value)} 
+                />
+              </div>
+              <div className="row">
+                <label>Gaming Float Variance:</label>
+                <input 
+                  placeholder="Enter gaming float variance"
+                  value={reportSecurityPerformance.gamingFloatVariance}
+                  onChange={e => updateSecurityPerformance("gamingFloatVariance", e.target.value)} 
+                />
+              </div>
+            </div>
+          </div>
 
           <div className="divider" />
 
