@@ -563,6 +563,11 @@ export default function App() {
               text-align: center;
               padding: 20px;
             }
+            td.no-data {
+              background: #f5f5f5;
+              border-radius: 8px;
+              margin: 10px 0;
+            }
           </style>
         </head>
         <body>
@@ -635,22 +640,25 @@ export default function App() {
             </table>
             
             <h3>Link Jackpots</h3>
-            <div class="link-jackpots-section">
-              <div class="link-jackpots-grid">
+            <table>
+              <thead>
+                <tr><th>Jackpot Name</th><th>Jackpot Amount</th></tr>
+              </thead>
+              <tbody>
                 ${
                   Object.entries(data.jackpots).length > 0
                     ? Object.entries(data.jackpots)
                         .map(([id, amount]) => `
-                          <div class="jackpot-input-item">
-                            <label>${id}</label>
-                            <input type="text" value="${amount || 'Not specified'}" readonly />
-                          </div>
+                          <tr>
+                            <td>${id}</td>
+                            <td>${amount || "Not specified"}</td>
+                          </tr>
                         `)
                         .join("")
-                    : `<div class='no-data'>No jackpots recorded</div>`
+                    : `<tr><td colspan="2" class="no-data">No jackpots recorded</td></tr>`
                 }
-              </div>
-            </div>
+              </tbody>
+            </table>
             
             <h3>Interactions</h3>
             <div class="interactions-new-section">
