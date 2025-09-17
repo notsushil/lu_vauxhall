@@ -525,6 +525,19 @@ export default function App() {
             data.logs.incidents.map(log => `<p><strong>${log.time}:</strong> ${log.note}</p>`).join('') : 
             '<p>No incidents recorded</p>'
           }
+          
+          <h3>Security Performance</h3>
+          <h4>Cash</h4>
+          <table>
+            <thead>
+              <tr><th>Cash Control Area</th><th>Variance</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Cash Variance</td><td>Nil</td></tr>
+              <tr><td>Trade Float Variance</td><td>Nil</td></tr>
+              <tr><td>Gaming Float Variance</td><td>Nil</td></tr>
+            </tbody>
+          </table>
           </div>
         </body>
       </html>
