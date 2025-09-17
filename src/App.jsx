@@ -664,30 +664,30 @@ export default function App() {
             <div className="logCard" style={{ width: "fit-content", maxWidth: "400px" }}>
               <h3>Cash Variance</h3>
               <div className="row" style={{ borderBottom: "1px solid var(--line)", paddingBottom: "10px", marginBottom: "10px" }}>
-                <div style={{ minWidth: 120, opacity: 0.95 }}>Cash Variance:</div>
+                <div style={{ width: "180px", opacity: 0.95 }}>Cash Variance:</div>
                 <input 
                   placeholder="-$58"
                   value={reportSecurityPerformance.cashVariance}
                   onChange={e => updateSecurityPerformance("cashVariance", e.target.value)} 
-                  style={{ width: "80px" }}
+                  style={{ width: "100px" }}
                 />
               </div>
               <div className="row" style={{ borderBottom: "1px solid var(--line)", paddingBottom: "10px", marginBottom: "10px" }}>
-                <div style={{ minWidth: 120, opacity: 0.95 }}>Trade Float Variance:</div>
+                <div style={{ width: "180px", opacity: 0.95 }}>Trade Float Variance:</div>
                 <input 
                   placeholder="-$58"
                   value={reportSecurityPerformance.tradeFloatVariance}
                   onChange={e => updateSecurityPerformance("tradeFloatVariance", e.target.value)} 
-                  style={{ width: "80px" }}
+                  style={{ width: "100px" }}
                 />
               </div>
               <div className="row">
-                <div style={{ minWidth: 120, opacity: 0.95 }}>Gaming Float Variance:</div>
+                <div style={{ width: "180px", opacity: 0.95 }}>Gaming Float Variance:</div>
                 <input 
                   placeholder="-$58"
                   value={reportSecurityPerformance.gamingFloatVariance}
                   onChange={e => updateSecurityPerformance("gamingFloatVariance", e.target.value)} 
-                  style={{ width: "80px" }}
+                  style={{ width: "100px" }}
                 />
               </div>
             </div>
