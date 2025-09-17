@@ -471,14 +471,97 @@ export default function App() {
               margin: 20px 0;
               border-left: 4px solid #667eea;
             }
+            .cash-variance-section {
+              margin: 35px 0;
+              padding: 0;
+            }
+            .cash-variance-section h3 {
+              color: #667eea;
+              margin-top: 0;
+            }
+            .variance-grid {
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+              gap: 20px;
+              margin: 20px 0;
+            }
+            .variance-item {
+              display: flex;
+              flex-direction: column;
+              gap: 8px;
+            }
+            .variance-item label {
+              font-weight: 600;
+              color: #374151;
+              font-size: 14px;
+            }
+            .variance-item input {
+              padding: 12px;
+              border: 1px solid #d1d5db;
+              border-radius: 6px;
+              font-size: 14px;
+              background: #f9fafb;
+            }
+            .link-jackpots-section {
+              margin: 35px 0;
+              padding: 0;
+            }
+            .link-jackpots-section h3 {
+              color: #667eea;
+              margin-top: 0;
+            }
+            .link-jackpots-grid {
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+              gap: 15px;
+              margin: 20px 0;
+            }
+            .jackpot-input-item {
+              display: flex;
+              flex-direction: column;
+              gap: 8px;
+            }
+            .jackpot-input-item label {
+              font-weight: 600;
+              color: #374151;
+              font-size: 14px;
+            }
+            .jackpot-input-item input {
+              padding: 12px;
+              border: 1px solid #d1d5db;
+              border-radius: 6px;
+              font-size: 14px;
+              background: #f9fafb;
+            }
+            .interactions-new-section {
+              margin: 35px 0;
+              padding: 0;
+            }
+            .interactions-new-section h3 {
+              color: #667eea;
+              margin-top: 0;
+            }
+            .interaction-expandable {
+              margin: 15px 0;
+              border: 1px solid #e5e7eb;
+              border-radius: 8px;
+              background: #fafbff;
+            }
+            .interaction-header {
+              padding: 15px 20px;
+              font-weight: 600;
+              color: #374151;
+              background: #f8faff;
+              border-bottom: 1px solid #e5e7eb;
+            }
+            .interaction-content {
+              padding: 15px 20px;
+            }
             .no-data {
-              color: #666;
+              color: #6b7280;
               font-style: italic;
               text-align: center;
               padding: 20px;
-              background: #f5f5f5;
-              border-radius: 8px;
-              margin: 10px 0;
             }
           </style>
         </head>
@@ -551,46 +634,82 @@ export default function App() {
               </tbody>
             </table>
             
-            <h3>Jackpots</h3>
-            <div class="jackpots-section">
-              ${
-                Object.entries(data.jackpots).length > 0
-                  ? Object.entries(data.jackpots)
-                      .map(([id, amount]) => `<p><strong>${id}:</strong> ${amount || "Not specified"}</p>`)
-                      .join("")
-                  : "<div class='no-data'>No jackpots recorded</div>"
-              }
+            <h3>Link Jackpots</h3>
+            <div class="link-jackpots-section">
+              <div class="link-jackpots-grid">
+                ${
+                  Object.entries(data.jackpots).length > 0
+                    ? Object.entries(data.jackpots)
+                        .map(([id, amount]) => `
+                          <div class="jackpot-input-item">
+                            <label>${id}</label>
+                            <input type="text" value="${amount || 'Not specified'}" readonly />
+                          </div>
+                        `)
+                        .join("")
+                    : `<div class='no-data'>No jackpots recorded</div>`
+                }
+              </div>
             </div>
             
             <h3>Interactions</h3>
-            <div class="interactions-section">
-              <h4>Gaming</h4>
-              ${
-                data.logs.gaming.length > 0
-                  ? data.logs.gaming.map((log) => `<p><strong>${log.time}:</strong> ${log.note}</p>`).join("")
-                  : "<div class='no-data'>No gaming interactions recorded</div>"
-              }
-              
-              <h4>Bar</h4>
-              ${
-                data.logs.bar.length > 0
-                  ? data.logs.bar.map((log) => `<p><strong>${log.time}:</strong> ${log.note}</p>`).join("")
-                  : "<div class='no-data'>No bar interactions recorded</div>"
-              }
-              
-              <h4>Incidents</h4>
-              ${
-                data.logs.incidents.length > 0
-                  ? data.logs.incidents.map((log) => `<p><strong>${log.time}:</strong> ${log.note}</p>`).join("")
-                  : "<div class='no-data'>No incidents recorded</div>"
-              }
+            <div class="interactions-new-section">
+              <div class="interaction-expandable">
+                <div class="interaction-header">
+                  <span>Gaming Interaction</span>
+                </div>
+                <div class="interaction-content">
+                  ${
+                    data.logs.gaming.length > 0
+                      ? data.logs.gaming.map((log) => `<p><strong>${log.time}:</strong> ${log.note}</p>`).join("")
+                      : "<div class='no-data'>No gaming interactions recorded</div>"
+                  }
+                </div>
+              </div>
+
+              <div class="interaction-expandable">
+                <div class="interaction-header">
+                  <span>Bar Interaction</span>
+                </div>
+                <div class="interaction-content">
+                  ${
+                    data.logs.bar.length > 0
+                      ? data.logs.bar.map((log) => `<p><strong>${log.time}:</strong> ${log.note}</p>`).join("")
+                      : "<div class='no-data'>No bar interactions recorded</div>"
+                  }
+                </div>
+              </div>
+
+              <div class="interaction-expandable">
+                <div class="interaction-header">
+                  <span>Incidents (throughout the night)</span>
+                </div>
+                <div class="interaction-content">
+                  ${
+                    data.logs.incidents.length > 0
+                      ? data.logs.incidents.map((log) => `<p><strong>${log.time}:</strong> ${log.note}</p>`).join("")
+                      : "<div class='no-data'>No incidents recorded</div>"
+                  }
+                </div>
+              </div>
             </div>
             
             <h3>Cash Variance</h3>
-            <div class="variance-section">
-              <p><strong>Cash Variance:</strong> ${data.securityPerformance.cashVariance || "Nil"}</p>
-              <p><strong>Trade Float Variance:</strong> ${data.securityPerformance.tradeFloatVariance || "Nil"}</p>
-              <p><strong>Gaming Float Variance:</strong> ${data.securityPerformance.gamingFloatVariance || "Nil"}</p>
+            <div class="cash-variance-section">
+              <div class="variance-grid">
+                <div class="variance-item">
+                  <label>Cash Variances</label>
+                  <input type="text" value="${data.securityPerformance.cashVariance || 'Nil'}" readonly />
+                </div>
+                <div class="variance-item">
+                  <label>Trade Float Variances</label>
+                  <input type="text" value="${data.securityPerformance.tradeFloatVariance || 'Nil'}" readonly />
+                </div>
+                <div class="variance-item">
+                  <label>Gaming Float Variances</label>
+                  <input type="text" value="${data.securityPerformance.gamingFloatVariance || 'Nil'}" readonly />
+                </div>
+              </div>
             </div>
             
             ${data.securityPerformance.additionalNotes ? `
