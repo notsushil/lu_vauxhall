@@ -669,6 +669,7 @@ export default function App() {
                   placeholder="-$58"
                   value={reportSecurityPerformance.cashVariance}
                   onChange={e => updateSecurityPerformance("cashVariance", e.target.value)} 
+                  style={{ width: "20%" }}
                 />
               </div>
               <div className="row">
@@ -677,6 +678,7 @@ export default function App() {
                   placeholder="-$58"
                   value={reportSecurityPerformance.tradeFloatVariance}
                   onChange={e => updateSecurityPerformance("tradeFloatVariance", e.target.value)} 
+                  style={{ width: "20%" }}
                 />
               </div>
               <div className="row">
@@ -685,6 +687,7 @@ export default function App() {
                   placeholder="-$58"
                   value={reportSecurityPerformance.gamingFloatVariance}
                   onChange={e => updateSecurityPerformance("gamingFloatVariance", e.target.value)} 
+                  style={{ width: "20%" }}
                 />
               </div>
             </div>
