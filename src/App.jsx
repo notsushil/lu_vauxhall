@@ -660,9 +660,9 @@ export default function App() {
           <div className="divider" />
 
           {/* Security Performance */}
-          <div className="rosterGrid">
-            <div className="rosterCard">
-              <h3>Security Performance</h3>
+          <div className="logWrap">
+            <div className="logCard">
+              <h3>Cash Variance</h3>
               <div className="row">
                 <div style={{ minWidth: 120, opacity: 0.95 }}>Cash Variance:</div>
                 <input 
@@ -689,7 +689,7 @@ export default function App() {
               </div>
             </div>
             
-            <div className="rosterCard">
+            <div className="logCard">
               <h3>Additional Notes</h3>
               <textarea 
                 placeholder="Enter any additional security performance notes..."
