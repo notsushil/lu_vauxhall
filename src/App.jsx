@@ -358,6 +358,8 @@ export default function App() {
 
   // Generate HTML content for the report
   function generateReportHTML(data) {
+    const headerStyle = "background-color: rgb(102, 126, 234); color: rgb(255, 255, 255); font-weight: 600; font-size: 14px; letter-spacing: 0.5px; text-transform: uppercase; padding: 16px 20px; text-align: left; border: none;";
+
     return `
       <!DOCTYPE html>
       <html>
@@ -366,189 +368,479 @@ export default function App() {
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>LevelUP Shift Report</title>
           <style>
+            * {
+              box-sizing: border-box;
+            }
+            
             body { 
-              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-              margin: 20px; 
+              font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+              margin: 0;
+              padding: 20px;
               background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
               color: #333;
+              line-height: 1.6;
+              min-height: 100vh;
             }
+            
             .email-container {
               background: white;
-              border-radius: 15px;
-              padding: 30px;
-              box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-              margin: 20px;
-              max-width: 800px;
+              border-radius: 20px;
+              padding: 40px;
+              box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+              margin: 0 auto;
+              max-width: 900px;
+              position: relative;
             }
+            
+            .header-section {
+              border-bottom: 2px solid #f0f2ff;
+              padding-bottom: 25px;
+              margin-bottom: 30px;
+              display: flex;
+              justify-content: space-between;
+              align-items: flex-start;
+              gap: 30px;
+            }
+            
+            .header-content {
+              flex: 1;
+            }
+            
             h1 { 
               color: #667eea; 
-              text-align: left; 
-              font-size: 32px; 
-              margin-bottom: 10px;
-              text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+              font-size: 36px; 
+              margin: 0 0 8px 0;
+              font-weight: 700;
+              letter-spacing: -0.5px;
+              display: flex;
+              align-items: center;
+              gap: 15px;
             }
+            
+            .logo {
+              font-size: 42px;
+              filter: drop-shadow(0 2px 4px rgba(102, 126, 234, 0.3));
+            }
+            
             h2 { 
-              color: #764ba2; 
-              text-align: left; 
-              font-size: 20px; 
-              margin-bottom: 20px;
+              color: #6b7280; 
+              font-size: 18px; 
+              margin: 0;
+              font-weight: 500;
             }
+            
             h3 { 
               color: #667eea; 
-              font-size: 22px; 
-              margin: 25px 0 15px 0;
-              border-bottom: 3px solid #667eea;
-              padding-bottom: 5px;
+              font-size: 24px; 
+              margin: 35px 0 20px 0;
+              font-weight: 600;
+              position: relative;
+              padding-left: 15px;
             }
+            
+            h3::before {
+              content: '';
+              position: absolute;
+              left: 0;
+              top: 50%;
+              transform: translateY(-50%);
+              width: 4px;
+              height: 24px;
+              background: linear-gradient(135deg, #667eea, #764ba2);
+              border-radius: 2px;
+            }
+            
             h4 { 
-              color: #764ba2; 
+              color: #374151; 
               font-size: 18px; 
-              margin: 20px 0 10px 0;
+              margin: 25px 0 12px 0;
+              font-weight: 600;
             }
+            
+            .section {
+              margin-bottom: 35px;
+            }
+            
             .roster-tables {
-              margin-left: 0;
-              max-width: 100%;
+              display: grid;
+              gap: 25px;
             }
+            
+            .roster-table {
+              width: 50%;
+            }
+            
             table { 
               border-collapse: collapse; 
               width: 100%; 
-              margin: 15px 0; 
-              border-radius: 8px;
+              border-radius: 12px;
               overflow: hidden;
-              box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+              box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+              margin-bottom: 20px;
             }
-            th, td { 
-              border: 1px solid #e0e0e0; 
-              padding: 12px; 
-              text-align: left; 
+            
+            td {
+              padding: 16px 20px;
+              text-align: left;
+              border: none;
+              background-color: #fafbff;
+              font-size: 15px;
+              border-bottom: 1px solid #e5e7eb;
+              color: rgb(51, 51, 51);
             }
-            th { 
-              background: linear-gradient(135deg, #667eea, #764ba2); 
-              color: white; 
-              font-weight: bold;
-              text-transform: uppercase;
+            
+            tr:last-child td {
+              border-bottom: none;
+            }
+            
+            tr:nth-child(even) td {
+              background-color: #f8faff;
+            }
+            
+            tr:hover td {
+              background-color: #f0f4ff;
+              transition: background-color 0.2s ease;
+            }
+            
+            .weather-info {
+              background: linear-gradient(135deg, #fef3c7, #fbbf24);
+              padding: 15px 20px;
+              border-radius: 12px;
+              text-align: center;
+              font-weight: 600;
+              font-size: 14px;
+              color: #92400e;
+              box-shadow: 0 4px 12px rgba(251, 191, 36, 0.2);
+              white-space: nowrap;
+              min-width: 200px;
+            }
+            
+            .jackpots-grid {
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+              gap: 15px;
+              margin: 20px 0;
+            }
+            
+            .jackpot-item {
+              background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+              padding: 20px;
+              border-radius: 12px;
+              border-left: 4px solid #0ea5e9;
+              box-shadow: 0 2px 8px rgba(14, 165, 233, 0.1);
+            }
+            
+            .jackpot-item strong {
+              color: #0c4a6e;
+              font-size: 16px;
+              display: block;
+              margin-bottom: 5px;
+            }
+            
+            .jackpot-amount {
+              color: #0ea5e9;
+              font-size: 20px;
+              font-weight: 700;
+            }
+            
+            .interactions-section {
+              display: grid;
+              gap: 25px;
+            }
+            
+            .interaction-category {
+              background: #f9fafb;
+              border-radius: 12px;
+              padding: 20px;
+              border: 1px solid #e5e7eb;
+            }
+            
+            .interaction-category h4 {
+              margin-top: 0;
+              color: #374151;
+              border-bottom: 2px solid #e5e7eb;
+              padding-bottom: 10px;
+            }
+            
+            .interaction-item {
+              background: white;
+              padding: 15px;
+              border-radius: 8px;
+              margin: 10px 0;
+              border-left: 3px solid #667eea;
+              box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            }
+            
+            .interaction-time {
+              color: #667eea;
+              font-weight: 600;
               font-size: 14px;
             }
-            td {
-              background-color: #f8f9ff;
+            
+            .interaction-note {
+              color: #374151;
+              margin-top: 5px;
             }
-            tr:nth-child(even) td {
-              background-color: #f0f2ff;
-            }
-            .weather-info {
-              background: linear-gradient(135deg, #ffecd2, #fcb69f);
-              padding: 15px;
-              border-radius: 10px;
-              margin: 20px 0;
+            
+            .no-data {
+              color: #6b7280;
+              font-style: italic;
               text-align: center;
-              font-weight: bold;
+              padding: 20px;
+            }
+
+            .cash-variance-section {
+              margin: 35px 0;
+              padding: 0;
+            }
+
+            .cash-variance-section h3 {
+              color: #667eea;
+              margin-top: 0;
+            }
+
+            .additional-notes-section {
+              margin: 35px 0;
+              padding: 0;
+            }
+
+            .additional-notes-section h3 {
+              color: #667eea;
+              margin-top: 0;
+            }
+
+            .variance-grid {
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+              gap: 20px;
+              margin: 20px 0;
+            }
+
+            .variance-item {
+              background: linear-gradient(135deg, #fef3c7, #fbbf24);
+              padding: 20px;
+              border-radius: 12px;
+              border-left: 4px solid #f59e0b;
+              box-shadow: 0 2px 8px rgba(245, 158, 11, 0.1);
+            }
+
+            .variance-item strong {
+              color: #92400e;
+              font-size: 16px;
+              display: block;
+              margin-bottom: 5px;
+            }
+
+            .variance-amount {
+              color: #f59e0b;
+              font-size: 20px;
+              font-weight: 700;
+            }
+
+            .notes-section {
+              background: #f9fafb;
+              border-radius: 12px;
+              padding: 20px;
+              border: 1px solid #e5e7eb;
+              margin: 20px 0;
+            }
+
+            .notes-content {
+              background: white;
+              padding: 15px;
+              border-radius: 8px;
+              border-left: 3px solid #667eea;
+              box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+              min-height: 100px;
+              white-space: pre-wrap;
+            }
+
+            @media (max-width: 768px) {
+              .email-container {
+                padding: 25px;
+                margin: 10px;
+              }
+              
+              h1 {
+                font-size: 28px;
+              }
+              
+              .header-section {
+                flex-direction: column;
+                align-items: stretch;
+              }
+              
+              .weather-info {
+                min-width: auto;
+              }
+              
+              .jackpots-grid,
+              .variance-grid {
+                grid-template-columns: 1fr;
+              }
             }
           </style>
         </head>
         <body>
           <div class="email-container">
-            <h1>LevelUP Shift Report</h1>
-            <h2>${data.date}</h2>
-            ${data.weather ? `<div class="weather-info">🌤️ Weather: ${data.weather.temp}°C - ${data.weather.desc}</div>` : ''}
+            <div class="header-section">
+              <div class="header-content">
+                <h1>LevelUP Shift Report</h1>
+                <h2>${data.date}</h2>
+              </div>
+              ${data.weather ? `<div class="weather-info">🌤️ ${data.weather.temp}°C - ${data.weather.desc}</div>` : ""}
+            </div>
             
-            <h3>Roster</h3>
-            <div class="roster-tables">
-              <h4>Managers</h4>
+            <div class="section">
+              <h3>Roster</h3>
+              <div class="roster-tables">
+                <div class="roster-table">
+                  <h4>👔 Managers</h4>
+                  <table>
+                    <thead>
+                      <tr><th style="${headerStyle}">Shift</th><th style="${headerStyle}">Names</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td><strong>Open</strong></td><td>${data.roster.managers.open.names || "Not specified"}</td></tr>
+                      <tr><td><strong>Mid</strong></td><td>${data.roster.managers.mid.names || "Not specified"}</td></tr>
+                      <tr><td><strong>Close</strong></td><td>${data.roster.managers.close.names || "Not specified"}</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                
+                <div class="roster-table">
+                  <h4>👩🏻‍💼 Staff</h4>
+                  <table>
+                    <thead>
+                      <tr><th style="${headerStyle}">Shift</th><th style="${headerStyle}">Names</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td><strong>Open</strong></td><td>${data.roster.staffs.open.names || "Not specified"}</td></tr>
+                      <tr><td><strong>Mid</strong></td><td>${data.roster.staffs.mid.names || "Not specified"}</td></tr>
+                      <tr><td><strong>Close</strong></td><td>${data.roster.staffs.close.names || "Not specified"}</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                
+                <div class="roster-table">
+                  <h4>💂 Security</h4>
+                  <table>
+                    <thead>
+                      <tr><th style="${headerStyle}">Type</th><th style="${headerStyle}">Details</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td><strong>Shift</strong></td><td>${data.roster.security.shift || "Not specified"}</td></tr>
+                      <tr><td><strong>Names</strong></td><td>${data.roster.security.names || "Not specified"}</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          
+            <div class="section">
+              <h3>📊 Hourly Data</h3>
               <table>
                 <thead>
-                  <tr><th>Shift</th><th>Names</th></tr>
+                  <tr><th style="${headerStyle}">Time</th><th style="${headerStyle}">Turnover</th><th style="${headerStyle}">EGM</th><th style="${headerStyle}">VIP Mix</th></tr>
                 </thead>
                 <tbody>
-                  <tr><td>Open</td><td>${data.roster.managers.open.names || 'Not specified'}</td></tr>
-                  <tr><td>Mid</td><td>${data.roster.managers.mid.names || 'Not specified'}</td></tr>
-                  <tr><td>Close</td><td>${data.roster.managers.close.names || 'Not specified'}</td></tr>
-                </tbody>
-              </table>
-              
-              <h4>Staff</h4>
-              <table>
-                <thead>
-                  <tr><th>Shift</th><th>Names</th></tr>
-                </thead>
-                <tbody>
-                  <tr><td>Open</td><td>${data.roster.staffs.open.names || 'Not specified'}</td></tr>
-                  <tr><td>Mid</td><td>${data.roster.staffs.mid.names || 'Not specified'}</td></tr>
-                  <tr><td>Close</td><td>${data.roster.staffs.close.names || 'Not specified'}</td></tr>
-                </tbody>
-              </table>
-              
-              <h4>Security</h4>
-              <table>
-                <thead>
-                  <tr><th>Type</th><th>Details</th></tr>
-                </thead>
-                <tbody>
-                  <tr><td>Shift</td><td>${data.roster.security.shift || 'Not specified'}</td></tr>
-                  <tr><td>Names</td><td>${data.roster.security.names || 'Not specified'}</td></tr>
+                  ${data.rows.map(row => `
+                    <tr>
+                      <td><strong>${row.hour}</strong></td>
+                      <td>${row.turnover || ""}</td>
+                      <td>${row.egm || ""}</td>
+                      <td>${Object.entries(row.vip || {}).map(([k,v]) => `${k}: ${v}`).join(", ") || ""}</td>
+                    </tr>
+                  `).join("")}
                 </tbody>
               </table>
             </div>
-          
-          <h3>Hourly Data</h3>
-          <table>
-            <thead>
-              <tr><th>Time</th><th>Turnover</th><th>EGM</th><th>VIP Mix</th></tr>
-            </thead>
-            <tbody>
-              ${data.rows.map(row => `
-                <tr>
-                  <td>${row.hour}</td>
-                  <td>${row.turnover || ''}</td>
-                  <td>${row.egm || ''}</td>
-                  <td>${Object.entries(row.vip || {}).map(([k,v]) => `${k}: ${v}`).join(', ') || ''}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-          
-          <h3>Jackpots</h3>
-          ${Object.entries(data.jackpots).length > 0 ? 
-            Object.entries(data.jackpots).map(([id, amount]) => 
-              `<p><strong>${id}:</strong> ${amount || 'Not specified'}</p>`
-            ).join('') : 
-            '<p>No jackpots recorded</p>'
-          }
-          
-          <h3>Interactions</h3>
-          <h4>Gaming</h4>
-          ${data.logs.gaming.length > 0 ? 
-            data.logs.gaming.map(log => `<p><strong>${log.time}:</strong> ${log.note}</p>`).join('') : 
-            '<p>No gaming interactions recorded</p>'
-          }
-          
-          <h4>Bar</h4>
-          ${data.logs.bar.length > 0 ? 
-            data.logs.bar.map(log => `<p><strong>${log.time}:</strong> ${log.note}</p>`).join('') : 
-            '<p>No bar interactions recorded</p>'
-          }
-          
-          <h4>Incidents</h4>
-          ${data.logs.incidents.length > 0 ? 
-            data.logs.incidents.map(log => `<p><strong>${log.time}:</strong> ${log.note}</p>`).join('') : 
-            '<p>No incidents recorded</p>'
-          }
-          
-          <h3>Security Performance</h3>
-          <table>
-            <thead>
-              <tr><th>Cash Control Area</th><th>Variance</th></tr>
-            </thead>
-            <tbody>
-              <tr><td>Cash Variance</td><td>${data.securityPerformance.cashVariance || 'Nil'}</td></tr>
-              <tr><td>Trade Float Variance</td><td>${data.securityPerformance.tradeFloatVariance || 'Nil'}</td></tr>
-              <tr><td>Gaming Float Variance</td><td>${data.securityPerformance.gamingFloatVariance || 'Nil'}</td></tr>
-            </tbody>
-          </table>
-          
-          ${data.securityPerformance.additionalNotes ? `
-            <h4>Additional Notes</h4>
-            <p>${data.securityPerformance.additionalNotes}</p>
-          ` : ''}
+            
+            <div class="section">
+              <h3>🎰 Jackpots</h3>
+              <div class="jackpots-grid">
+                ${Object.entries(data.jackpots).length > 0 ? 
+                  Object.entries(data.jackpots).map(([id, amount]) => 
+                    `<div class="jackpot-item">
+                      <strong>${id}</strong>
+                      <div class="jackpot-amount">${amount || "Not specified"}</div>
+                    </div>`
+                  ).join("") : 
+                  '<div class="no-data">No jackpots recorded</div>'
+                }
+              </div>
+            </div>
+            
+            <div class="section">
+              <h3>📝 Interactions</h3>
+              <div class="interactions-section">
+                <div class="interaction-category">
+                  <h4>🎮 Gaming</h4>
+                  ${data.logs.gaming.length > 0 ? 
+                    data.logs.gaming.map(log => 
+                      `<div class="interaction-item">
+                        <div class="interaction-time">${log.time}</div>
+                        <div class="interaction-note">${log.note}</div>
+                      </div>`
+                    ).join("") : 
+                    '<div class="no-data">No gaming interactions recorded</div>'
+                  }
+                </div>
+                
+                <div class="interaction-category">
+                  <h4>🍺 Bar</h4>
+                  ${data.logs.bar.length > 0 ? 
+                    data.logs.bar.map(log => 
+                      `<div class="interaction-item">
+                        <div class="interaction-time">${log.time}</div>
+                        <div class="interaction-note">${log.note}</div>
+                      </div>`
+                    ).join("") : 
+                    '<div class="no-data">No bar interactions recorded</div>'
+                  }
+                </div>
+                
+                <div class="interaction-category">
+                  <h4>⚠️ Incidents</h4>
+                  ${data.logs.incidents.length > 0 ? 
+                    data.logs.incidents.map(log => 
+                      `<div class="interaction-item">
+                        <div class="interaction-time">${log.time}</div>
+                        <div class="interaction-note">${log.note}</div>
+                      </div>`
+                    ).join("") : 
+                    '<div class="no-data">No incidents recorded</div>'
+                  }
+                </div>
+              </div>
+            </div>
+            
+            <div class="cash-variance-section">
+              <h3>💰 Cash Variance</h3>
+              <div class="variance-grid">
+                <div class="variance-item">
+                  <strong>Cash Variance</strong>
+                  <div class="variance-amount">${data.securityPerformance.cashVariance || "Nil"}</div>
+                </div>
+                <div class="variance-item">
+                  <strong>Trade Float Variance</strong>
+                  <div class="variance-amount">${data.securityPerformance.tradeFloatVariance || "Nil"}</div>
+                </div>
+                <div class="variance-item">
+                  <strong>Gaming Float Variance</strong>
+                  <div class="variance-amount">${data.securityPerformance.gamingFloatVariance || "Nil"}</div>
+                </div>
+              </div>
+            </div>
+            
+            ${data.securityPerformance.additionalNotes ? `
+              <div class="additional-notes-section">
+                <h3>📋 Additional Notes</h3>
+                <div class="notes-section">
+                  <div class="notes-content">${data.securityPerformance.additionalNotes}</div>
+                </div>
+              </div>
+            ` : ""}
           </div>
         </body>
       </html>
