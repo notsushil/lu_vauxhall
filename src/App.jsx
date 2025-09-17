@@ -661,24 +661,24 @@ export default function App() {
 
           {/* Security Performance */}
           <div className="logWrap">
-            <div className="logCard">
+            <div className="logCard" style={{ width: "fit-content", maxWidth: "400px" }}>
               <h3>Cash Variance</h3>
-              <div className="row">
+              <div className="row" style={{ borderBottom: "1px solid var(--line)", paddingBottom: "10px", marginBottom: "10px" }}>
                 <div style={{ minWidth: 120, opacity: 0.95 }}>Cash Variance:</div>
                 <input 
                   placeholder="-$58"
                   value={reportSecurityPerformance.cashVariance}
                   onChange={e => updateSecurityPerformance("cashVariance", e.target.value)} 
-                  style={{ width: "20%" }}
+                  style={{ width: "80px" }}
                 />
               </div>
-              <div className="row">
+              <div className="row" style={{ borderBottom: "1px solid var(--line)", paddingBottom: "10px", marginBottom: "10px" }}>
                 <div style={{ minWidth: 120, opacity: 0.95 }}>Trade Float Variance:</div>
                 <input 
                   placeholder="-$58"
                   value={reportSecurityPerformance.tradeFloatVariance}
                   onChange={e => updateSecurityPerformance("tradeFloatVariance", e.target.value)} 
-                  style={{ width: "20%" }}
+                  style={{ width: "80px" }}
                 />
               </div>
               <div className="row">
@@ -687,7 +687,7 @@ export default function App() {
                   placeholder="-$58"
                   value={reportSecurityPerformance.gamingFloatVariance}
                   onChange={e => updateSecurityPerformance("gamingFloatVariance", e.target.value)} 
-                  style={{ width: "20%" }}
+                  style={{ width: "80px" }}
                 />
               </div>
             </div>
