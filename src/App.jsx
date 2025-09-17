@@ -523,43 +523,33 @@ export default function App() {
             }
             
             .jackpot-item {
-              background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
-              padding: 24px 20px;
-              border-radius: 16px;
-              border-left: 5px solid #0ea5e9;
-              box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15);
-              text-align: center;
-              transition: transform 0.2s ease, box-shadow 0.2s ease;
+              display: flex;
+              flex-direction: column;
+              gap: 8px;
             }
             
-            .jackpot-item:hover {
-              transform: translateY(-2px);
-              box-shadow: 0 6px 20px rgba(14, 165, 233, 0.2);
-            }
-            
-            .jackpot-name {
-              color: #0c4a6e;
+            .jackpot-label {
+              color: #374151;
               font-size: 14px;
               font-weight: 600;
-              margin-bottom: 8px;
-              text-transform: uppercase;
-              letter-spacing: 0.5px;
+              margin-bottom: 4px;
               line-height: 1.3;
             }
             
-            .jackpot-amount {
-              color: #0ea5e9;
-              font-size: 24px;
-              font-weight: 800;
-              margin-top: 8px;
-              text-shadow: 0 1px 2px rgba(14, 165, 233, 0.2);
-            }
-            
-            .jackpot-icon {
-              font-size: 32px;
-              margin-bottom: 12px;
-              display: block;
-              filter: drop-shadow(0 2px 4px rgba(14, 165, 233, 0.3));
+            .jackpot-input {
+              background: #f9fafb;
+              border: 1px solid #d1d5db;
+              border-radius: 8px;
+              padding: 12px 16px;
+              font-size: 16px;
+              font-weight: 500;
+              color: #111827;
+              text-align: center;
+              min-height: 48px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
             }
             
             .interactions-section {
@@ -698,20 +688,14 @@ export default function App() {
                 gap: 15px;
               }
               
-              .jackpot-item {
-                padding: 20px 16px;
+              .jackpot-input {
+                min-height: 44px;
+                font-size: 15px;
+                padding: 10px 14px;
               }
               
-              .jackpot-icon {
-                font-size: 28px;
-              }
-              
-              .jackpot-name {
+              .jackpot-label {
                 font-size: 13px;
-              }
-              
-              .jackpot-amount {
-                font-size: 20px;
               }
               
               .variance-grid {
@@ -801,9 +785,8 @@ export default function App() {
                 ${Object.entries(data.jackpots).length > 0 ? 
                   Object.entries(data.jackpots).map(([id, amount]) => 
                     `<div class="jackpot-item">
-                      <span class="jackpot-icon">🎰</span>
-                      <div class="jackpot-name">${id.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</div>
-                      <div class="jackpot-amount">${amount || "Not specified"}</div>
+                      <div class="jackpot-label">${id.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</div>
+                      <div class="jackpot-input">${amount || ""}</div>
                     </div>`
                   ).join("") : 
                   '<div class="no-data">No jackpots recorded</div>'
